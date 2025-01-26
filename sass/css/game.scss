@@ -1,0 +1,186 @@
+dialog {
+    max-width: 80vw;
+    overflow-y: auto;
+    position: relative;
+}
+
+dialog::backdrop {
+    background-color: rgb(0 0 0 / 50%);
+}
+
+dialog h2 {
+    margin-top: 0;
+}
+
+dialog .buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: end;
+    position: sticky;
+    bottom: 0;
+}
+
+.backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgb(0 0 0 / 50%);
+    height: 100%;
+    width: 100%;
+    display: none;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    background: white;
+    height: 100%;
+    display: none;
+    z-index: 1;
+    padding: 1em;
+    border: 3px solid black;
+    box-sizing: border-box;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5em;
+    align-items: baseline;
+}
+
+.left-header {
+    display: flex;
+    gap: 1rem;
+    align-items: baseline;
+}
+
+.settings {
+    display: flex;
+    padding-inline: 0.5em;
+    justify-content: center;
+    align-items: center;
+}
+
+button {
+    font-family: 'ClearSans', sans-serif;
+    border: 2px solid black;
+    border-radius: 6px;
+    cursor: pointer;
+    padding: 0 0.25rem 0.1rem 0.25rem;
+    width: fit-content;
+    font-size: 1em;
+    color: white;
+    fill: white;
+    background-color: black;
+}
+
+button:hover {
+    color: black;
+    fill: black;
+    background-color: white;
+}
+
+.title {
+    font-weight: bold;
+    font-size: 1.25rem;
+}
+
+.game {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.section {
+    border: 2px solid black;
+    overflow-y: auto;
+}
+
+.section > .name {
+    margin: 0.25rem 0.5rem;
+    text-decoration: underline;
+}
+
+.board {
+    height: 100%;
+    overflow-y: auto;
+    display: flex;
+    align-items: flex-end;
+    box-sizing: border-box;
+}
+
+.player {
+    margin-inline: 0.5rem;
+}
+
+.input {
+    margin-inline: 0.5rem;
+}
+
+input-area {
+    display: flex;
+    flex-direction: column;
+}
+
+input-area textarea {
+    box-sizing: border-box;
+    border: 1px solid black;
+    resize: vertical;
+}
+
+.input-format {
+    font-family: monospace;
+    border: 1px solid black;
+    border-radius: 4px;
+    background-color: #EEEEEE;
+}
+
+.input-format > div {
+    margin: 0.25rem 0.5rem;
+}
+
+.constraints {
+    padding-inline: 1em;
+    margin-block: 0;
+}
+
+game-piles {
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: flex-end;
+}
+
+game-pile {
+    flex-grow: 1;
+}
+
+.item-container {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+}
+
+.item {
+    width: 20%;
+    cursor: pointer;
+    fill: none;
+    display: flex;
+    box-sizing: border-box;
+}
+
+.item .ready-to-select {
+    fill: lightgreen;
+}
+
+.pile-base {
+    border: 1px solid black;
+    text-align: center;
+}
+
+.status {
+    display: flex;
+    gap: 1em;
+}

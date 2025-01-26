@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ page.title }} - {{ config.title }}
+{% endblock title %}
+
+{% block head %}
+<link rel="stylesheet" href="/css/game.css">
+<script type="importmap">
+{% raw %}
+{
+    "imports": {
+        "pile": "/js/view/pile.js",
+        "game": "./game.js",
+        "common": "/js/view/common.js",
+        "components": "/js/view/components.js",
+        "player": "/js/player.js",
+        "base-game": "/js/game.js",
+        "controller": "/js/controller.js"
+    }
+}
+{% endraw %}
+</script>
+<script type="module" src="/js/main.js" defer></script>
+{% endblock head %}
+
+{% block content %}
+<div class="game">
+    <div class="backdrop"></div>
+    <dialog class="new-game">
+        <h2>New Game</h2>
+        <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+            <div class="section">
+                <div class="name">Player</div>
+                <div class="player"></div>
+            </div>
+            <div class="section">
+                <div class="name">Input</div>
+                <div class="input"></div>
+            </div>
+        </div>
+        <div class="buttons">
+            <button class="how-to-play">How to play?</button>
+            <button class="start-game" autofocus>Start game!</button>
+        </div>
+    </dialog>
+    <dialog class="how-to-play">
+        <div>{{ page.content | safe }}</div>
+        <div class="buttons">
+            <button class="close" autofocus>Close</button>
+        </div>
+    </dialog>
+    <div class="sidebar">
+        <div class="header">
+            <div class="left-header">
+                <div class="title">Settings</div>
+            </div>
+            <button class="close">Close</button>
+        </div>
+        <div>
+            Settings sjsj skls kekd sjd
+        </div>
+    </div>
+    <div class="header">
+        <div class="left-header">
+            <div class="title">{{ page.title }}</div>
+            <button class="new-game">New game</button>
+            <button class="how-to-play">How to play?</button>
+            <button onclick="window.location = '/'">Exit game</button>
+        </div>
+        <button class="settings">Settings</button>
+    </div>
+    <div class="status">
+        <div class="player-turn">First player turn</div>
+        <div class="move"></div>
+    </div>
+    <div class="board section"></div>
+</div>
+{% endblock content %}

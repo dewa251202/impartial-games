@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="title">
+    Nim Games Collection
+</h1>
+<p>
+    Collection of impartial games equivalent to nim, even the classic one!
+</p>
+<ul>
+    {% set games = get_section(path = 'games/_index.md') %}
+    {% for game in games.pages %}
+        <li><a href="{{ game.path }}">{{ game.title }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock content %}
