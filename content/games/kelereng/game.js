@@ -1,4 +1,4 @@
-import { MultiplePilesGame, SinglePileNim } from "base-game";
+import { MultiplePilesGame } from "base-game";
 
 class Game extends MultiplePilesGame {
     constructor(piles, firstPlayer, secondPlayer){
@@ -11,17 +11,6 @@ class Game extends MultiplePilesGame {
             return false;
         }
         return (itemCount - itemIndex <= 6);
-    }
-}
-
-class Kelereng extends SinglePileNim {
-    /**
-     * 
-     * @param {number} removedItemCount 
-     * @returns 
-     */
-    isValidMove(removedItemCount){
-        return removedItemCount <= 6;
     }
 }
 

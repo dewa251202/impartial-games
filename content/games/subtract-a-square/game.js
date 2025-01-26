@@ -1,4 +1,4 @@
-import { MultiplePilesGame, SinglePileNim } from "base-game";
+import { MultiplePilesGame } from "base-game";
 
 class Game extends MultiplePilesGame {
     constructor(piles, firstPlayer, secondPlayer){
@@ -15,20 +15,6 @@ class Game extends MultiplePilesGame {
             if(i * i === itemCount - itemIndex){
                 return true;
             }
-        }
-        return false;
-    }
-}
-
-class SubtractASquare extends SinglePileNim {
-    /**
-     * 
-     * @param {number} removedItemCount 
-     * @returns 
-     */
-    isValidMove(removedItemCount){
-        for(let i = 1; i * i <= removedItemCount; i++){
-            if(i * i === removedItemCount) return true;
         }
         return false;
     }

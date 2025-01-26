@@ -24,7 +24,7 @@ class Controller {
                 if(result.type === InputState.Invalid){
                     return;
                 }
-                this.#game = new GameCombinations();
+                this.#game = new GameCombinations(result.piles.map(itemCount => new SinglePileNim(itemCount)));
                 // this.#game.display();
                 newGameDialog.close();
             }

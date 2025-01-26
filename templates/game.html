@@ -6,7 +6,7 @@
 
 {% block head %}
 <link rel="stylesheet" href="/css/game.css">
-<script type="importmap">
+{# <script type="importmap">
 {% raw %}
 {
     "imports": {
@@ -20,8 +20,23 @@
     }
 }
 {% endraw %}
+</script> #}
+<script type="importmap">
+{% raw %}
+{
+    "imports": {
+        "pile": "/jees/view/pile.js",
+        "game": "./game.js",
+        "common": "/jees/view/common.js",
+        "components": "/jees/view/components.js",
+        "player": "/jees/player.js",
+        "base-game": "/jees/game.js",
+        "controller": "/jees/controller.js"
+    }
+}
+{% endraw %}
 </script>
-<script type="module" src="/js/main.js" defer></script>
+<script type="module" src="/jees/main.js" defer></script>
 {% endblock head %}
 
 {% block content %}

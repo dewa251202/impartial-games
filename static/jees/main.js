@@ -1,6 +1,6 @@
 import { Constants } from "./common.js";
 import { PileInput, InputState } from "./view/pile.js";
-import { PlayerConfig } from "./player.js";
+import { HumanPlayer, PcPlayer, PlayerConfig } from "./player.js";
 import { Game } from "game";
 
 class Screen {
@@ -95,6 +95,7 @@ class Screen {
 }
 
 function main(){
+    console.log("halooo");
     const inputStrategy = new PileInput([
         'N = number of piles',
         'P<sub>i</sub> = number of items in the i-th pile',
