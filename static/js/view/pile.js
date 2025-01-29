@@ -1,71 +1,105 @@
-import { Constants, getRandomInt, InputState } from "../common.js";
-import { Controller } from "../controller.js";
-import { InputArea, InputConstraints, InputFormat } from "./input.js";
+import { GameState } from "game";
+import { Controller } from "controller";
+import { PcPlayer } from "player";
 
-class PileInput {
-    #FORMAT_LINES = ['P<sub>1</sub> P<sub>2</sub> ... P<sub>N</sub><br>'];
-    #CAPTION = 'Enter the number of items in each pile:';
-
-    #inputArea;
-    #inputFormat;
-    #inputConstraints;
+class Piles extends HTMLElement {
+    #gameState;
+    #games;
+    #piles;
     #controller;
 
     /**
      * 
-     * @param {string[]} constraints 
+     * @param {GameState} gameState 
      */
-    constructor(constraints){
-        constraints ??= [];
-        
-        const placeholder = Constants.DEFAULT_PILES.join(' ');
-        this.#inputArea = new InputArea(this.#CAPTION, placeholder, this.#FORMAT_LINES.length);
-        this.#inputFormat = new InputFormat(this.#FORMAT_LINES);
-        this.#inputConstraints = new InputConstraints(constraints);
+    constructor(gameState){
+        super();
+        this.#gameState = gameState;
+        this.#games = this.#gameState.getGames();
+        this.#piles = this.#games.map((game, gameIndex) => new Pile(game.currentItemCount, gameIndex, this));
+    }
+    
+    connectedCallback(){
+        this.#piles.forEach(pile => this.appendChild(pile));
+        this.startTurn();
     }
 
-    parseValue(){
-        const lines = this.#inputArea.getValue()
-            .split(/\r\n|\r|\n/)
-            .map(line => line.trim())
-            .filter(line => line.length > 0);
-        if(lines.length < 1){
-            return { type: InputState.Invalid, message: 'There must be one line of integers separated by space' };
-        }
-        else if(lines.length > 1){
-            console.warn('There are more than two lines');
-        }
-
-        const _piles = lines[0].split(/\s/).filter(pile => pile.length > 0);
-        if(!(0 < _piles.length && _piles.length <= 10)){
-            return { type: InputState.Invalid, message: `N = ${_piles.length} violates the constraint` };
-        }
-
-        const piles = [];
-        for(let i = 0; i < _piles.length; i++){
-            const pile = parseInt(_piles[i]);
-            if(Number.isNaN(pile)){
-                return {
-                    type: InputState.Invalid,
-                    message: `P<sub>${i + 1}</sub> = '${_piles[i]}' cannot be parsed into a valid integer`
-                };
-            }
-            if(!(0 <= pile && pile <= 15)){
-                return { type: InputState.Invalid, message: `P<sub>${i + 1}</sub> = ${pile} violates the constraint` };
-            }
-            piles.push(pile);
-        }
-
-        return { type: InputState.Valid, piles };
+    doPcPlayerTurn(nextState){
+        if(nextState === null) return false;
+        const [pileIndex, itemIndex] = nextState;
+        setTimeout(() => {
+            this.notify('mouseenter', { pileIndex, itemIndex });
+            setTimeout(() => this.notify('click', { pileIndex, itemIndex }), 250);
+        }, 500);
+        return true;
     }
 
-    generateRandomPiles(){
-        const n = getRandomInt(1, 10);
-        const piles = [];
-        for(let i = 0; i < n; i++){
-            piles.push(getRandomInt(0, 15).toString());
+    /**
+     * 
+     * @param {string} type 
+     * @param {any} data 
+     */
+    notify(type, data){
+        let currentPlayer = this.#gameState.getCurrentPlayer();
+        let { pileIndex, itemIndex } = data;
+        const pile = this.#piles[pileIndex];
+        const removedItemCount = this.#games[pileIndex].currentItemCount - itemIndex;
+
+        if(type === 'mouseenter'){
+            if(this.#gameState.isValidMove(pileIndex, removedItemCount)){
+                pile.addHints(removedItemCount);
+
+                const moveMessage = `${currentPlayer.getRole()} is going to remove ${removedItemCount} items from ${pile.getName()}`;
+                this.#notifyController('beforemove', { moveMessage });
+            }
         }
-        this.#inputArea.setValue(piles.join(' '));
+        else if(type === 'click'){
+            if(this.#gameState.isValidMove(pileIndex, removedItemCount)){
+                this.#gameState.makeMove(pileIndex, removedItemCount);
+                pile.removeItems(removedItemCount);
+
+                const moveMessage = `${currentPlayer.getRole()} removed ${removedItemCount} items from ${pile.getName()}`;
+                currentPlayer = this.#gameState.getCurrentPlayer();
+                this.#notifyController('aftermove', { currentPlayer, moveMessage });
+
+                this.startTurn();
+            }
+        }
+        else if(type === 'mouseleave'){
+            pile.removeHints();
+            this.#notifyController('cancelmove', { moveMessage: '' });
+        }
+    }
+
+    #notifyController(type, detail){
+        const event = new CustomEvent(type, { detail });
+        this.#controller.notify(this, event);
+    }
+
+    /**
+     * 
+     * @param {GameState} gameState 
+     */
+    setGameState(gameState){
+        this.#gameState = gameState;
+        this.#games = this.#gameState.getGames();
+        this.#piles = this.#games.map((game, gameIndex) => new Pile(game.currentItemCount, gameIndex, this));
+        this.connectedCallback();
+    }
+    
+    startTurn(){
+        this.#notifyController('gametype', { isWinning: this.#gameState.isWinningGame() });
+        if(!this.#gameState.getCurrentPlayer().doTurn(this, this.#gameState)){
+            this.#notifyController('gamefinished', { previousPlayer: this.#gameState.getPrevPlayer() });
+        }
+    }
+
+    /**
+     * 
+     * @param {boolean} value 
+     */
+    enableInteractions(value){
+        this.#piles.forEach(pile => pile.enableInteractions(value));
     }
 
     /**
@@ -76,54 +110,9 @@ class PileInput {
         this.#controller = controller;
     }
 
-    /**
-     * 
-     * @param {Element} element 
-     */
-    display(element){
-        element.appendChild(this.#inputArea);
-        element.appendChild(this.#inputFormat);
-        element.appendChild(this.#inputConstraints);
-    }
-}
-
-class Piles extends HTMLElement {
-    #game;
-    #piles;
-
-    constructor(piles, game){
-        super();
-        this.#game = game;
-
-        piles ??= [];
-        if(piles.length === 0) console.warn("There are no piles.");
-        this.#piles = piles.map((itemCount, pileIndex) => new Pile(itemCount, pileIndex, this));
-    }
-
-    connectedCallback(){
-        this.#piles.forEach(pile => this.appendChild(pile));
-    }
-
-    notify(eventType, data){
-        const removedItemIndices = this.#game.tryMove(data);
-        if(removedItemIndices === null) return;
-
-        const { pile, pileIndex } = data;
-        const { currentPlayer } = this.#game.getState();
-        if(eventType === 'mouseenter'){
-            pile.addHint(removedItemIndices);
-            const text = `${currentPlayer.getRole()} is going to remove ${removedItemIndices.length} items from Pile #${pileIndex + 1}.`;
-            document.querySelector('.move').innerText = text;
-        }
-        else if(eventType === 'click'){
-            pile.removeItems(removedItemIndices);
-            this.#game.makeMove(data);
-            const text = `${currentPlayer.getRole()} removed ${removedItemIndices.length} items from Pile #${pileIndex + 1}.`
-            document.querySelector('.move').innerText = text;
-        }
-        else if(eventType === 'mouseleave'){
-            pile.removeHints();
-            document.querySelector('.move').innerText = '';
+    clear(){
+        while(this.hasChildNodes()){
+            this.removeChild(this.lastChild);
         }
     }
 }
@@ -131,22 +120,22 @@ class Piles extends HTMLElement {
 class Pile extends HTMLElement {
     #itemCount;
     #pileIndex;
-    #board;
-    #innerItems;
+    #parent;
+    #itemContainer;
+    #name;
+    #interactionsEnabled;
+    #lastData;
 
-    constructor(itemCount, pileIndex, board){
+    constructor(itemCount, pileIndex, parent){
         super();
         this.#itemCount = itemCount ?? 0;
         this.#pileIndex = pileIndex;
-        this.#board = board;
-        this.#innerItems = [];
-    }
+        this.#parent = parent;
+        this.#itemContainer = document.createElement('div');
+        this.#name = `Pile #${pileIndex + 1}`;
+        this.#interactionsEnabled = false;
 
-    connectedCallback(){
-        const itemContainer = document.createElement('div');
-        itemContainer.classList.add('item-container');
-        this.appendChild(itemContainer);
-
+        this.#itemContainer.classList.add('item-container');
         for(let i = 0; i < this.#itemCount; i++){
             const item = document.createElement('div');
             item.innerHTML = 
@@ -154,42 +143,73 @@ class Pile extends HTMLElement {
     <circle cx="50" cy="50" r="49" stroke="black" />
 </svg>`;
             item.classList.add('item');
-            itemContainer.appendChild(item);
-
-            this.#innerItems.push(item.firstChild);
+            this.#itemContainer.appendChild(item);
         }
 
-        for(let i = 0; i < this.#innerItems.length; i++){
-            const data = { pile: this, pileIndex: this.#pileIndex, itemIndex: i };
-            itemContainer.childNodes[i].addEventListener('mouseleave', () => this.#board.notify('mouseleave', data));
-            this.#innerItems[i].addEventListener('mouseenter', () => this.#board.notify('mouseenter', data));
-            this.#innerItems[i].addEventListener('click', () => this.#board.notify('click', data));
-        }
-        
+        this.#itemContainer.childNodes.forEach((item, i) => {
+            const data = { pileIndex: this.#pileIndex, itemIndex: i };
+            this.#addListener('mouseleave', item, data);
+            this.#addListener('mouseenter', item.firstChild, data);
+            this.#addListener('click', item.firstChild, data);
+        });
+    }
+
+    connectedCallback(){
+        this.appendChild(this.#itemContainer);
+
         const pileBase = document.createElement('div');
-        pileBase.innerText = (this.#pileIndex + 1) ? `Pile #${this.#pileIndex + 1}` : 'Pile';
+        pileBase.innerText = this.#name;
         pileBase.classList.add('pile-base');
         this.appendChild(pileBase);
     }
 
-    removeHints(){
-        this.#innerItems.forEach(item => item.classList.remove('ready-to-select'));
+    /**
+     * 
+     * @param {boolean} value 
+     */
+    enableInteractions(value){
+        this.#interactionsEnabled = value;
+        if(this.#interactionsEnabled && this.#lastData) this.#parent.notify('mouseenter', this.#lastData);
+        else this.#lastData = null;
+        this.#itemContainer.childNodes.forEach(item => {
+            const cl = item.firstChild.classList;
+            if(this.#interactionsEnabled) cl.add('cursor-pointer');
+            else cl.remove('cursor-pointer');
+        });
     }
 
-    addHint(itemIndices){
-        for(const index of itemIndices){
-            this.#innerItems[index].classList.add('ready-to-select');
+    #addListener(type, element, data){
+        element.addEventListener(type, () => {
+            if(type === 'mouseenter') this.#lastData = { ...data };
+            if(!this.#interactionsEnabled) return;
+            this.#parent.notify(type, data);
+        });
+    }
+
+    removeHints(){
+        this.#itemContainer.childNodes.forEach(item => item.firstChild.classList.remove('ready-to-select'));
+    }
+
+    addHints(removedItemCount){
+        const childNodes = this.#itemContainer.childNodes;
+        for(let i = 1; i <= removedItemCount; i++){
+            childNodes[childNodes.length - i].firstChild.classList.add('ready-to-select');
         }
     }
 
-    removeItems(itemIndices){
-        for(const index of itemIndices){
-            this.#innerItems[index].parentNode.remove();
-        }        
+    removeItems(removedItemCount){
+        while(removedItemCount > 0){
+            this.#itemContainer.removeChild(this.#itemContainer.lastChild);
+            removedItemCount--;
+        }
+    }
+
+    getName(){
+        return this.#name;
     }
 }
 
 customElements.define('game-pile', Pile);
 customElements.define('game-piles', Piles);
 
-export { PileInput, InputState, Piles };
+export { Piles };

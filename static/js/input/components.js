@@ -1,4 +1,7 @@
-class InputArea extends HTMLElement {
+import { toKebabCase } from "common";
+
+class InputTextarea extends HTMLElement {
+    #id;
     #caption;
     #rows;
     #placeholder;
@@ -10,8 +13,9 @@ class InputArea extends HTMLElement {
      * @param {string} placeholder 
      * @param {number} rows 
      */
-    constructor(caption, placeholder, rows){
+    constructor(id, caption, placeholder, rows){
         super();
+        this.#id = toKebabCase(id);
         this.#caption = caption ?? 'Enter board configuration:';
         this.#placeholder = placeholder ?? '';
         this.#rows = rows ?? 2;
@@ -22,12 +26,12 @@ class InputArea extends HTMLElement {
         if(this.#caption.length > 0){
             const label = document.createElement('label');
             label.innerText = this.#caption;
-            label.htmlFor = 'game-input';
+            label.htmlFor = `${this.#id}-input`;
             this.appendChild(label);
         }
 
         const textarea = this.#textarea;
-        textarea.id = 'game-input';
+        textarea.id = `${this.#id}-input`;
         textarea.rows = this.#rows;
         textarea.placeholder = this.#placeholder;
         this.appendChild(textarea);
@@ -43,6 +47,60 @@ class InputArea extends HTMLElement {
      */
     setValue(value){
         this.#textarea.value = value;
+    }
+}
+
+class InputNumber extends HTMLElement {
+    #id;
+    #caption;
+    #placeholder;
+    #input;
+
+    /**
+     * 
+     * @param {string} caption 
+     * @param {string} placeholder 
+     */
+    constructor(id, caption, placeholder, minValue, maxValue){
+        super();
+        this.#id = toKebabCase(id);
+        this.#caption = caption ?? 'Enter a number:';
+        this.#placeholder = placeholder ?? '';
+
+        this.#input = document.createElement('input');
+        this.#input.min = minValue;
+        this.#input.max = maxValue;
+    }
+    
+    connectedCallback(){
+        if(this.#caption.length > 0){
+            const label = document.createElement('label');
+            // label.style.display = 'block';
+            label.innerText = this.#caption;
+            label.htmlFor = `${this.#id}-input`;
+            this.appendChild(label);
+        }
+        
+        const input = this.#input;
+        input.type = 'number';
+        input.min = 1;
+        input.max = 10;
+        input.step = 1;
+        input.id = `${this.#id}-input`;
+        input.placeholder = this.#placeholder;
+        this.appendChild(input);
+    }
+
+    getValue(){
+        return parseInt(this.#input.value);
+    }
+
+    /**
+     * 
+     * @param {number} value 
+     */
+    setValue(value){
+        this.#input.value = value;
     }
 }
 
@@ -79,6 +137,7 @@ class InputConstraints extends HTMLElement {
     connectedCallback(){
         const span = document.createElement('span');
         span.innerText = 'where';
+        span.style.display = 'block';
         this.appendChild(span);
 
         const ul = document.createElement('ul');
@@ -93,8 +152,9 @@ class InputConstraints extends HTMLElement {
     }
 }
 
-customElements.define('input-area', InputArea);
+customElements.define('input-textarea', InputTextarea);
+customElements.define('input-number', InputNumber);
 customElements.define('input-format', InputFormat);
 customElements.define('input-constraints', InputConstraints);
 
-export { InputArea, InputFormat, InputConstraints };
+export { InputTextarea, InputNumber, InputFormat, InputConstraints };

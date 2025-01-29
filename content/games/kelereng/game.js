@@ -1,17 +1,82 @@
-import { MultiplePilesGame } from "base-game";
+import { Piles } from "view/pile.js";
+import { BaseGameState, SinglePileNim } from "base-game";
+import { Controller } from "controller";
+import { ArrayInputBuilder } from "input/array.js";
+import { NumberInputBuilder } from "input/number.js";
 
-class Game extends MultiplePilesGame {
-    constructor(piles, firstPlayer, secondPlayer){
-        super(piles, firstPlayer, secondPlayer);
+class Kelereng extends SinglePileNim {
+    #maxItemsToRemove;
+
+    /**
+     * 
+     * @param {number} itemCount 
+     * @param {number} maxItemsToRemove 
+     */
+    constructor(itemCount, maxItemsToRemove){
+        super(itemCount);
+        this.#maxItemsToRemove = maxItemsToRemove;
     }
 
-    isValidMove(pileIndex, itemIndex){
-        const itemCount = this.getItemCount(pileIndex);
-        if(itemIndex === undefined || !(0 <= itemIndex && itemIndex < itemCount)){
-            return false;
+    /**
+     * 
+     * @param {number} removedItemCount 
+     * @returns 
+     */
+    isValidMove(removedItemCount){
+        return 1 <= removedItemCount && removedItemCount <= this.#maxItemsToRemove;
+    }
+
+    getNextPossibleGames(){
+        return this.getNextPossibleStates().map(itemCount => new Kelereng(itemCount, this.#maxItemsToRemove));
+    }
+
+    getNextPossibleStates(){
+        const nextPossibleStates = [];
+        for(let i = 1; i <= this.#maxItemsToRemove; i++){
+            if(0 <= this.currentItemCount - i){
+                nextPossibleStates.push(this.currentItemCount - i);
+            }
         }
-        return (itemCount - itemIndex <= 6);
+        return nextPossibleStates;
+    }
+
+    hash(){
+        return this.currentItemCount;
     }
 }
 
-export { Game };
+class GameState extends BaseGameState {
+    /**
+     * 
+     * @param {number[]} piles 
+     * @param {number[]} maxItemsToRemove 
+     */
+    constructor(piles, maxItemsToRemove){
+        super();
+        piles ??= [];
+        maxItemsToRemove ??= [];
+        if(piles.length === 0) console.warn('There are no piles.');
+        const games = piles.map(itemCount => new Kelereng(itemCount, maxItemsToRemove));
+        this.setGames(games);
+    }
+}
+
+const pileInput = new ArrayInputBuilder()
+    .setCaption('Enter the number of items in each pile:')
+    .setDefaultValue([4, 7, 5])
+    .setArrayLengthDesc('N', 'number of piles')
+    .setArrayDesc('P', 'i', 'number of items in the i-th pile')
+    .setArrayLengthBound(1, 10)
+    .setArrayValueBound(0, 15)
+    .build();
+const numberInput = new NumberInputBuilder()
+    .setCaption('Enter the maximum number of items that can be removed:')
+    .setDefaultValue(6)
+    .setValueDesc('m', 'Maximum removed items')
+    .setValueBound(1, 10)
+    .build();
+const gameState = new GameState(pileInput.defaultValue, numberInput.defaultValue);
+const board = new Piles(gameState);
+new Controller([pileInput, numberInput], board);
+
+export { GameState };

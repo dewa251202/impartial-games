@@ -6,37 +6,22 @@
 
 {% block head %}
 <link rel="stylesheet" href="/css/game.css">
-{# <script type="importmap">
-{% raw %}
-{
-    "imports": {
-        "pile": "/js/view/pile.js",
-        "game": "./game.js",
-        "common": "/js/view/common.js",
-        "components": "/js/view/components.js",
-        "player": "/js/player.js",
-        "base-game": "/js/game.js",
-        "controller": "/js/controller.js"
-    }
-}
-{% endraw %}
-</script> #}
 <script type="importmap">
 {% raw %}
 {
     "imports": {
-        "pile": "/jees/view/pile.js",
         "game": "./game.js",
-        "common": "/jees/view/common.js",
-        "components": "/jees/view/components.js",
-        "player": "/jees/player.js",
-        "base-game": "/jees/game.js",
-        "controller": "/jees/controller.js"
+        "common": "/js/common.js",
+        "controller": "/js/controller.js",
+        "player": "/js/player.js",
+        "input/": "/js/input/",
+        "view/": "/js/view/",
+        "base-game": "/js/game/module.js"
     }
 }
 {% endraw %}
 </script>
-<script type="module" src="/jees/main.js" defer></script>
+ <script type="module" src="./game.js"></script>
 {% endblock head %}
 
 {% block content %}
@@ -44,7 +29,7 @@
     <div class="backdrop"></div>
     <dialog class="new-game">
         <h2>New Game</h2>
-        <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+        <div class="content">
             <div class="section">
                 <div class="name">Player</div>
                 <div class="player"></div>
@@ -85,10 +70,7 @@
         </div>
         <button class="settings">Settings</button>
     </div>
-    <div class="status">
-        <div class="player-turn">First player turn</div>
-        <div class="move"></div>
-    </div>
+    <game-status></game-status>
     <div class="board section"></div>
 </div>
 {% endblock content %}
