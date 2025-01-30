@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% set SITE_ROOT = get_env(name = "SITE_ROOT", default = "") | safe %}
+{% set SITE_ROOT = get_env(name = "SITE_ROOT", default = "") %}
 
 {% block title %}
 {{ page.title }} - {{ config.title }}
@@ -8,10 +8,8 @@
 {% block head %}
 <link rel="stylesheet" href="{{ SITE_ROOT }}/css/game.css">
 <script type="importmap">
-{% raw %}
 {
     "imports": {
-{% endraw %}
         "game": "./game.js",
         "common": "{{ SITE_ROOT | safe }}/js/common.js",
         "controller": "{{ SITE_ROOT | safe }}/js/controller.js",
@@ -19,10 +17,8 @@
         "input/": "{{ SITE_ROOT | safe }}/js/input/",
         "view/": "{{ SITE_ROOT | safe }}/js/view/",
         "base-game": "{{ SITE_ROOT | safe }}/js/game/module.js"
-{% raw %}
     }
 }
-{% endraw %}
 </script>
  <script type="module" src="./game.js"></script>
 {% endblock head %}
