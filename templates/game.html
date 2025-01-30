@@ -8,17 +8,21 @@
 {% block head %}
 <link rel="stylesheet" href="{{ SITE_ROOT }}/css/game.css">
 <script type="importmap">
+{% raw %}
 {
     "imports": {
+{% endraw %}
         "game": "./game.js",
-        "common": "{{ SITE_ROOT }}/js/common.js",
-        "controller": "{{ SITE_ROOT }}/js/controller.js",
-        "player": "{{ SITE_ROOT }}/js/player.js",
-        "input/": "{{ SITE_ROOT }}/js/input/",
-        "view/": "{{ SITE_ROOT }}/js/view/",
-        "base-game": "{{ SITE_ROOT }}/js/game/module.js"
+        "common": "{{ SITE_ROOT | safe }}/js/common.js",
+        "controller": "{{ SITE_ROOT | safe }}/js/controller.js",
+        "player": "{{ SITE_ROOT | safe }}/js/player.js",
+        "input/": "{{ SITE_ROOT | safe }}/js/input/",
+        "view/": "{{ SITE_ROOT | safe }}/js/view/",
+        "base-game": "{{ SITE_ROOT | safe }}/js/game/module.js"
+{% raw %}
     }
 }
+{% endraw %}
 </script>
  <script type="module" src="./game.js"></script>
 {% endblock head %}
