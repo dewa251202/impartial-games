@@ -74,7 +74,7 @@ const setInput = new ArrayInputBuilder()
     .setDefaultValue([2, 5])
     .setArrayDesc('s', 'i', 'element of the set')
     .setArrayLengthBound(1, 10)
-    .setArrayValueBound(0, 15)
+    .setArrayValueBound(1, 15)
     .build();
 const gameState = new GameState(pileInput.defaultValue, setInput.defaultValue);
 const board = new Piles(gameState);
