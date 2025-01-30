@@ -1,7 +1,7 @@
 # The URL the site will be built for
-base_url = "https://dewa251202.github.io/nim-games/"
+base_url = "https://dewa251202.github.io/impartial-games/"
 
-title = "Nim Games Collection"
+title = "Impartial Games Collection"
 
 # Whether to automatically compile all Sass files in the sass directory
 compile_sass = true
