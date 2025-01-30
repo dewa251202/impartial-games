@@ -17,3 +17,4 @@ jobs:
           TOKEN: ${{ secrets.PUBLIC_TOKEN }}
           # Or if publishing to the same repo, use the automatic token
           #TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SITE_ROOT: /impartial-games

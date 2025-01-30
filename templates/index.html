@@ -10,7 +10,7 @@
 <ul>
     {% set games = get_section(path = 'games/_index.md') %}
     {% for game in games.pages %}
-        <li><a href="{{ game.path }}">{{ game.title }}</a></li>
+        <li><a href="{{ SITE_ROOT }}/{{ game.path | safe }}">{{ game.title }}</a></li>
     {% endfor %}
 </ul>
 {% endblock content %}
