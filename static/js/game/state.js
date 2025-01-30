@@ -1,7 +1,6 @@
 import { GameCombinations } from "./combinations.js";
-import { HumanPlayer, PcPlayer, Player } from "player";
+import { Player } from "player";
 import { ImpartialGame } from "./impartial.js";
-import { DEFAULT_FIRST_PLAYER, DEFAULT_SECOND_PLAYER } from "common";
 
 class BaseGameState {
     #turnIndex;
@@ -14,8 +13,8 @@ class BaseGameState {
      * @param {Player} secondPlayer 
      */
     constructor(firstPlayer, secondPlayer){
-        firstPlayer ??= DEFAULT_FIRST_PLAYER;
-        secondPlayer ??= DEFAULT_SECOND_PLAYER;
+        firstPlayer ??= document.getElementById('first-player-config').getPlayer();
+        secondPlayer ??= document.getElementById('second-player-config').getPlayer();
         this.#turnIndex = 0;
         this.players = [firstPlayer, secondPlayer];
     }
@@ -62,12 +61,12 @@ class BaseGameState {
         return this.#combinedGames.canMove();
     }
 
-    getRandomNextState(){
-        return this.#combinedGames.getRandomNextState();
+    getRandomNextPosition(){
+        return this.#combinedGames.getRandomNextPosition();
     }
 
-    getRandomOptimalNextState(){
-        return this.#combinedGames.getRandomOptimalNextState();
+    getRandomOptimalNextPosition(){
+        return this.#combinedGames.getRandomOptimalNextPosition();
     }
 
     isWinningGame(){

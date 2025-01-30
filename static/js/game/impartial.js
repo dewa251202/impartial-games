@@ -6,12 +6,12 @@ class ImpartialGame {
      */
     makeMove(moveData){
         if(!this.isValidMove(moveData)) return false;
-        this.moveToNextState(moveData);
+        this.moveToNextPosition(moveData);
         return true;
     }
 
     canMove(){
-        return this.getNextPossibleStates().length > 0;
+        return this.getNextPossiblePositions().length > 0;
     }
 }
 

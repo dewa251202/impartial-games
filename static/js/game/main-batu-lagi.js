@@ -19,7 +19,7 @@ class MainBatuLagi extends ImpartialGame {
      * 
      * @param {number} nextCell 
      */
-    moveToNextState(nextCell){
+    moveToNextPosition(nextCell){
         this.#currentCell = nextCell;
     }
 
@@ -34,17 +34,17 @@ class MainBatuLagi extends ImpartialGame {
     }
 
     getNextPossibleGames(){
-        return this.getNextPossibleStates()
+        return this.getNextPossiblePositions()
             .map(cell => new MainBatuLagi(this.#nextCellsBound, cell));
     }
 
-    getNextPossibleStates(){
+    getNextPossiblePositions(){
         const [a, b] = this.#nextCellsBound[this.#currentCell];
-        const nextPossibleStates = [];
+        const nextPossiblePositions = [];
         for(let j = a; j <= b; j++){
-            nextPossibleStates.push(j);
+            nextPossiblePositions.push(j);
         }
-        return nextPossibleStates;
+        return nextPossiblePositions;
     }
 
     hash(){

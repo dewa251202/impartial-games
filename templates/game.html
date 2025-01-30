@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% set SITE_ROOT = get_env(name = "SITE_ROOT", default = "") %}
 
-{% block title %}
-{{ page.title }} - {{ config.title }}
-{% endblock title %}
+{% block description %}Halo{% endblock description %}
+
+{% block title %}{{ page.title }} - {{ config.title }}{% endblock title %}
 
 {% block head %}
 <link rel="stylesheet" href="{{ SITE_ROOT }}/css/game.css">
@@ -31,7 +31,10 @@
         <div class="content">
             <div class="section">
                 <div class="name">Player</div>
-                <div class="player"></div>
+                <div class="player">
+                    <player-config player-role="First player" pc-behavior="optimal"></player-config>
+                    <player-config player-role="Second player" type="pc"></player-config>
+                </div>
             </div>
             <div class="section">
                 <div class="name">Input</div>

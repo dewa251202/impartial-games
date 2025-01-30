@@ -26,17 +26,17 @@ class SNim extends SinglePileNim {
     }
 
     getNextPossibleGames(){
-        return this.getNextPossibleStates().map(itemCount => new SNim(itemCount, this.#predefinedSet));
+        return this.getNextPossiblePositions().map(itemCount => new SNim(itemCount, this.#predefinedSet));
     }
 
-    getNextPossibleStates(){
-        const nextPossibleStates = [];
+    getNextPossiblePositions(){
+        const nextPossiblePositions = [];
         for(const removedItemCount of this.#predefinedSet){
             if(0 <= this.currentItemCount - removedItemCount){
-                nextPossibleStates.push(this.currentItemCount - removedItemCount);
+                nextPossiblePositions.push(this.currentItemCount - removedItemCount);
             }
         }
-        return nextPossibleStates;
+        return nextPossiblePositions;
     }
 
     hash(){

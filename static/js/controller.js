@@ -1,6 +1,6 @@
 import { Button, Dialog, Sidebar } from "view/components.js";
 import { GameState } from "game";
-import { DEFAULT_FIRST_PLAYER_CONFIG, DEFAULT_SECOND_PLAYER_CONFIG, InputState } from "common";
+import { InputState } from "common";
 
 // This is not exactly controller, but a mediator. Well, whatever.
 class Controller {
@@ -46,8 +46,8 @@ class Controller {
         this.#newGameDialog = new Dialog('dialog.new-game', this);
         this.#howToPlayDialog = new Dialog('dialog.how-to-play', this);
 
-        this.#firstPlayerConfig = DEFAULT_FIRST_PLAYER_CONFIG;
-        this.#secondPlayerConfig = DEFAULT_SECOND_PLAYER_CONFIG;
+        this.#firstPlayerConfig = document.getElementById('first-player-config');
+        this.#secondPlayerConfig = document.getElementById('second-player-config');
 
         this.#settingsSidebar = new Sidebar('.sidebar');
 
@@ -110,10 +110,6 @@ class Controller {
     }
 
     #attachComponents(){
-        const playerConfigs = document.querySelector('.player');
-        playerConfigs.appendChild(this.#firstPlayerConfig);
-        playerConfigs.appendChild(this.#secondPlayerConfig);
-
         const gameInput = document.querySelector('.game .input');
         for(const input of this.#inputs){
             gameInput.appendChild(input);

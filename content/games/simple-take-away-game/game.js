@@ -4,7 +4,7 @@ import { Controller } from "controller";
 import { ArrayInputBuilder } from "input/array.js";
 import { NumberInputBuilder } from "input/number.js";
 
-class Kelereng extends SinglePileNim {
+class SimpleTakeAwayGame extends SinglePileNim {
     #maxItemsToRemove;
 
     /**
@@ -27,17 +27,17 @@ class Kelereng extends SinglePileNim {
     }
 
     getNextPossibleGames(){
-        return this.getNextPossibleStates().map(itemCount => new Kelereng(itemCount, this.#maxItemsToRemove));
+        return this.getNextPossiblePositions().map(itemCount => new SimpleTakeAwayGame(itemCount, this.#maxItemsToRemove));
     }
 
-    getNextPossibleStates(){
-        const nextPossibleStates = [];
+    getNextPossiblePositions(){
+        const nextPossiblePositions = [];
         for(let i = 1; i <= this.#maxItemsToRemove; i++){
             if(0 <= this.currentItemCount - i){
-                nextPossibleStates.push(this.currentItemCount - i);
+                nextPossiblePositions.push(this.currentItemCount - i);
             }
         }
-        return nextPossibleStates;
+        return nextPossiblePositions;
     }
 
     hash(){
@@ -56,7 +56,7 @@ class GameState extends BaseGameState {
         piles ??= [];
         maxItemsToRemove ??= [];
         if(piles.length === 0) console.warn('There are no piles.');
-        const games = piles.map(itemCount => new Kelereng(itemCount, maxItemsToRemove));
+        const games = piles.map(itemCount => new SimpleTakeAwayGame(itemCount, maxItemsToRemove));
         this.setGames(games);
     }
 }

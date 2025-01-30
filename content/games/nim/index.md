@@ -1,5 +1,6 @@
 +++
 title = "Nim"
+description = "The classic Nim game"
 +++
 
 ## How to Play?

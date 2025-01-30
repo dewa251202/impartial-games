@@ -2,6 +2,7 @@
 base_url = "https://dewa251202.github.io/impartial-games/"
 
 title = "Impartial Games Collection"
+description = "Collection of impartial games"
 
 # Whether to automatically compile all Sass files in the sass directory
 compile_sass = true

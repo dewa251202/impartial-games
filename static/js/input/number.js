@@ -34,6 +34,7 @@ class NumberInput extends HTMLElement {
     }
     
     parseValue(){
+        if(Number.isNaN(this.#inputNumber.getValue())) this.#inputNumber.setValue(this.defaultValue);
         const [minValue, maxValue] = this.valueBound;
         const value = this.#inputNumber.getValue();
         if(!(minValue <= value && value <= maxValue)){

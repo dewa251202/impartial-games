@@ -27,15 +27,15 @@ class SubtractASquare extends SinglePileNim {
     }
 
     getNextPossibleGames(){
-        return this.getNextPossibleStates().map(itemCount => new SubtractASquare(itemCount));
+        return this.getNextPossiblePositions().map(itemCount => new SubtractASquare(itemCount));
     }
 
-    getNextPossibleStates(){
-        const nextPossibleStates = [];
+    getNextPossiblePositions(){
+        const nextPossiblePositions = [];
         for(let i = 1; i * i <= this.currentItemCount; i++){
-            nextPossibleStates.push(this.currentItemCount - i * i);
+            nextPossiblePositions.push(this.currentItemCount - i * i);
         }
-        return nextPossibleStates;
+        return nextPossiblePositions;
     }
 
     hash(){

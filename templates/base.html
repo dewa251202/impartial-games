@@ -4,6 +4,7 @@
 
 <head>
     <meta charset="utf-8">
+    <meta name="description" content="{% block desciption %}{{ config.description }}{% endblock %}">
     <link rel="shortcut icon" href="{{ SITE_ROOT | safe }}/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="{{ SITE_ROOT | safe }}/css/style.css">
     <title>{% block title %}{{ config.title }}{% endblock %}</title>

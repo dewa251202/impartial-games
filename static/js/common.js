@@ -3,14 +3,7 @@
  * @typedef {import("view/pile.js").Piles} Board
  */
 
-import { PlayerConfig } from "player";
-
 const DEFAULT_PILES = [3, 5, 4];
-const DEFAULT_ROLES = ['First player', 'Second player'];
-const DEFAULT_FIRST_PLAYER_CONFIG = new PlayerConfig(DEFAULT_ROLES[0], true, true);
-const DEFAULT_SECOND_PLAYER_CONFIG = new PlayerConfig(DEFAULT_ROLES[1], true, true);
-const DEFAULT_FIRST_PLAYER = DEFAULT_FIRST_PLAYER_CONFIG.getPlayer();
-const DEFAULT_SECOND_PLAYER = DEFAULT_SECOND_PLAYER_CONFIG.getPlayer();
 
 const InputState = {
     Invalid: 0,
@@ -92,6 +85,5 @@ function shuffled(array){
     return copiedArray;
 }
 
-export { DEFAULT_PILES, DEFAULT_FIRST_PLAYER_CONFIG, DEFAULT_SECOND_PLAYER_CONFIG, DEFAULT_FIRST_PLAYER, DEFAULT_SECOND_PLAYER };
-export { InputState }
+export { DEFAULT_PILES, InputState }
 export { getRandomInt, toKebabCase, div, shuffled };

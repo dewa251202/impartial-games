@@ -16,7 +16,7 @@ class SinglePileNim extends ImpartialGame {
      * 
      * @param {number} removedItemCount 
      */
-    moveToNextState(removedItemCount){
+    moveToNextPosition(removedItemCount){
         this.currentItemCount -= removedItemCount;
     }
 
@@ -30,15 +30,15 @@ class SinglePileNim extends ImpartialGame {
     }
 
     getNextPossibleGames(){
-        return this.getNextPossibleStates().map(itemCount => new SinglePileNim(itemCount));
+        return this.getNextPossiblePositions().map(itemCount => new SinglePileNim(itemCount));
     }
 
-    getNextPossibleStates(){
-        const nextPossibleStates = [];
+    getNextPossiblePositions(){
+        const nextPossiblePositions = [];
         for(let i = 0; i < this.currentItemCount; i++){
-            nextPossibleStates.push(i);
+            nextPossiblePositions.push(i);
         }
-        return nextPossibleStates;
+        return nextPossiblePositions;
     }
 
     hash(){

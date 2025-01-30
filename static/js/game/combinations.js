@@ -75,29 +75,29 @@ class GameCombinations {
         return this.#movableGames.length > 0;
     }
 
-    getRandomNextState(){
+    getRandomNextPosition(){
         if(this.#movableGames.length === 0) return null;
         const gameIndex = getRandomInt(0, this.#movableGames.length - 1);
         const gameData = this.#movableGames[gameIndex];
-        const nextPossibleStates = gameData.game.getNextPossibleStates();
-        const stateIndex = getRandomInt(0, nextPossibleStates.length - 1);
-        return [gameData.index, nextPossibleStates[stateIndex]];
+        const nextPossiblePositions = gameData.game.getNextPossiblePositions();
+        const stateIndex = getRandomInt(0, nextPossiblePositions.length - 1);
+        return [gameData.index, nextPossiblePositions[stateIndex]];
     }
 
-    getRandomOptimalNextState(){
+    getRandomOptimalNextPosition(){
         const currentNimSum = this.getNimSum();
         // console.log(currentNimSum);
-        if(currentNimSum === 0) return this.getRandomNextState();
+        if(currentNimSum === 0) return this.getRandomNextPosition();
         const shuffledGames = shuffled(this.#movableGames);
         // console.log(shuffledGames);
         for(const { index, game } of shuffledGames){
             const nimber = this.#nimberAnalyzer.calculateNimber(game);
             const nextGames = game.getNextPossibleGames();
-            const nextStates = game.getNextPossibleStates();
-            for(let i = 0; i < nextStates.length; i++){
+            const nextPositions = game.getNextPossiblePositions();
+            for(let i = 0; i < nextPositions.length; i++){
                 const nextNimber = this.#nimberAnalyzer.calculateNimber(nextGames[i]);
                 if((currentNimSum ^ nimber ^ nextNimber) === 0){
-                    return [index, nextStates[i]];
+                    return [index, nextPositions[i]];
                 }
             }
         }

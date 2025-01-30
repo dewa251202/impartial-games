@@ -62,7 +62,9 @@ class ArrayInput extends HTMLElement {
     }
 
     parseValue(){
-        const lines = this.#inputTextarea.getValue()
+        const inputValue = this.#inputTextarea.getValue();
+        if(inputValue === '') this.#inputTextarea.setValue(this.#placeholder);
+        const lines = inputValue
             .split(/\r\n|\r|\n/)
             .map(line => line.trim())
             .filter(line => line.length > 0);

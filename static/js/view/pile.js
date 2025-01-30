@@ -1,6 +1,5 @@
 import { GameState } from "game";
 import { Controller } from "controller";
-import { PcPlayer } from "player";
 
 class Piles extends HTMLElement {
     #gameState;
@@ -24,9 +23,9 @@ class Piles extends HTMLElement {
         this.startTurn();
     }
 
-    doPcPlayerTurn(nextState){
-        if(nextState === null) return false;
-        const [pileIndex, itemIndex] = nextState;
+    doPcPlayerTurn(nextPosition){
+        if(nextPosition === null) return false;
+        const [pileIndex, itemIndex] = nextPosition;
         setTimeout(() => {
             this.notify('mouseenter', { pileIndex, itemIndex });
             setTimeout(() => this.notify('click', { pileIndex, itemIndex }), 250);
