@@ -1,6 +1,5 @@
 +++
 title = "Main Batu Lagi"
-
-[extra]
-js = "/js/main-batu-lagi.js"
+description = "A chip-moving game"
+draft = true
 +++
