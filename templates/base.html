@@ -1,4 +1,4 @@
-{% set SITE_ROOT = get_env(name = "SITE_ROOT", default = "") %}
+{% set SITE_ROOT = get_env(name = "SITE_ROOT", default = "") | safe %}
 <!DOCTYPE html>
 <html lang="en">
 
