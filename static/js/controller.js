@@ -28,13 +28,12 @@ class Controller {
      * 
      * @param {import("common").InputStrategy[]} inputs 
      * @param {import("common").Board} board 
-     * @param  {...any} initialGameStateArgs 
      */
     constructor(inputs, board){
-        board.setController(this);
-
         this.#board = board;
         this.#inputs = inputs;
+
+        this.#board.setController(this);
 
         this.#newGameButton = new Button('button.new-game', this);
         this.#headerHowToPlayButton = new Button('.header button.how-to-play', this);
@@ -53,6 +52,7 @@ class Controller {
 
         this.#gameStatus = document.querySelector('game-status');
 
+        this.#startNewGame(true);
         this.#attachComponents();
     }
 
@@ -73,21 +73,7 @@ class Controller {
             this.#howToPlayDialog.close();
         }
         else if(sender === this.#startGameButton){
-            const results = this.#inputs.map(input => input.parseValue());
-            if(results.some(result => result.type === InputState.Invalid)){
-                return;
-            }
-            const args = results.map(result => result.data);
-    
-            const firstPlayer = this.#firstPlayerConfig.getPlayer();
-            const secondPlayer = this.#secondPlayerConfig.getPlayer();
-            const gameState = new GameState(...args);
-            gameState.players = [firstPlayer, secondPlayer];
-    
-            this.#board.clear();
-            this.#board.setGameState(gameState);
-            this.#gameStatus.reset();
-            this.#newGameDialog.close();
+            this.#startNewGame();
         }
         else if(sender === this.#settingsButton){
             this.#settingsSidebar.open();
@@ -117,6 +103,32 @@ class Controller {
         
         const gameBoard = document.querySelector('.game .board');
         gameBoard.appendChild(this.#board);
+    }
+
+    #startNewGame(isFirstTime = false){
+        let args;
+        if(isFirstTime){
+            args = this.#inputs.map(input => input.defaultValue);
+        }
+        else{
+            const results = this.#inputs.map(input => input.parseValue());
+            if(results.some(result => result.type === InputState.Invalid)){
+                return;
+            }
+            args = results.map(result => result.data);
+        }
+
+        const firstPlayer = this.#firstPlayerConfig.getPlayer();
+        const secondPlayer = this.#secondPlayerConfig.getPlayer();
+        const gameState = new GameState(...args);
+        gameState.setPlayers(firstPlayer, secondPlayer);
+        this.#board.setGameState(gameState);
+        if(!isFirstTime){
+            this.#board.startTurn();
+        }
+
+        this.#gameStatus.reset();
+        this.#newGameDialog.close();
     }
 }
 

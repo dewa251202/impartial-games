@@ -1,9 +1,9 @@
-import { Piles } from "view/pile.js";
-import { BaseGameState, SinglePileNim } from "base-game";
+import { Piles, RemoveTop } from "view/pile.js";
+import { BaseGameState, ScalarSubtractionGame } from "base-game";
 import { Controller } from "controller";
 import { ArrayInputBuilder } from "input/array.js";
 
-class SNim extends SinglePileNim {
+class SNim extends ScalarSubtractionGame {
     #predefinedSet;
 
     /**
@@ -12,35 +12,16 @@ class SNim extends SinglePileNim {
      * @param {number[]} predefinedSet 
      */
     constructor(itemCount, predefinedSet){
-        super(itemCount);
+        super(itemCount, function*(){
+            for(const element of predefinedSet){
+                yield element;
+            }
+        });
         this.#predefinedSet = predefinedSet;
     }
 
-    /**
-     * 
-     * @param {number} removedItemCount 
-     * @returns 
-     */
-    isValidMove(removedItemCount){
-        return this.#predefinedSet.includes(removedItemCount);
-    }
-
-    getNextPossibleGames(){
-        return this.getNextPossiblePositions().map(itemCount => new SNim(itemCount, this.#predefinedSet));
-    }
-
-    getNextPossiblePositions(){
-        const nextPossiblePositions = [];
-        for(const removedItemCount of this.#predefinedSet){
-            if(0 <= this.currentItemCount - removedItemCount){
-                nextPossiblePositions.push(this.currentItemCount - removedItemCount);
-            }
-        }
-        return nextPossiblePositions;
-    }
-
-    hash(){
-        return this.currentItemCount;
+    isValidMove(value){
+        return this.#predefinedSet.includes(value);
     }
 }
 
@@ -55,6 +36,8 @@ class GameState extends BaseGameState {
         piles ??= [];
         predefinedSet ??= [];
         if(piles.length === 0) console.warn('There are no piles.');
+        predefinedSet = Array.from(new Set(predefinedSet)).sort((a, b) => a - b);
+        console.log(predefinedSet);
         const games = piles.map(itemCount => new SNim(itemCount, predefinedSet));
         this.setGames(games);
     }
@@ -62,7 +45,8 @@ class GameState extends BaseGameState {
 
 const pileInput = new ArrayInputBuilder()
     .setCaption('Enter the number of beads in each heap:')
-    .setDefaultValue([2, 3, 7, 12])
+    // .setDefaultValue([2, 3, 7, 12])
+    .setDefaultValue([8, 8, 2, 9, 9, 3, 5, 13, 0, 10, 11])
     .setArrayLengthDesc('l', 'number of heaps')
     .setArrayDesc('h', 'i', 'number of beads in the i-th heap')
     .setArrayLengthBound(1, 10)
@@ -76,8 +60,7 @@ const setInput = new ArrayInputBuilder()
     .setArrayLengthBound(1, 10)
     .setArrayValueBound(1, 15)
     .build();
-const gameState = new GameState(pileInput.defaultValue, setInput.defaultValue);
-const board = new Piles(gameState);
+const board = new Piles(new RemoveTop());
 new Controller([pileInput, setInput], board);
 
 export { GameState };

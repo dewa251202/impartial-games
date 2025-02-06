@@ -1,6 +1,6 @@
 +++
 title = "S-Nim"
-description = "General subtraction game with with finite set"
+description = "General subtraction game with finite set."
 draft = false
 +++
 

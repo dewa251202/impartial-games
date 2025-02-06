@@ -5,18 +5,19 @@ import { ImpartialGame } from "./impartial.js";
 class BaseGameState {
     #turnIndex;
     #combinedGames;
-    players;
+    #players;
 
+    constructor(){
+        this.#turnIndex = 0;
+    }
+    
     /**
      * 
      * @param {Player} firstPlayer 
      * @param {Player} secondPlayer 
      */
-    constructor(firstPlayer, secondPlayer){
-        firstPlayer ??= document.getElementById('first-player-config').getPlayer();
-        secondPlayer ??= document.getElementById('second-player-config').getPlayer();
-        this.#turnIndex = 0;
-        this.players = [firstPlayer, secondPlayer];
+    setPlayers(firstPlayer, secondPlayer){
+        this.#players = [firstPlayer, secondPlayer];
     }
 
     /**
@@ -28,7 +29,7 @@ class BaseGameState {
     }
 
     getCurrentPlayer(){
-        return this.players[this.#turnIndex % 2];
+        return this.#players[this.#turnIndex % 2];
     }
 
     getNextPlayer(){
@@ -36,7 +37,7 @@ class BaseGameState {
     }
 
     getLastPlayer(){
-        return this.players[(this.#turnIndex + 1) % 2];
+        return this.#players[(this.#turnIndex + 1) % 2];
     }
 
     getPrevPlayer(){
@@ -47,12 +48,12 @@ class BaseGameState {
         return this.#combinedGames.getGames();
     }
 
-    isValidMove(pileIndex, removedItemCount){
-        return this.#combinedGames.isValidMove(pileIndex, removedItemCount);
+    isValidMove(gameIndex, ...moveData){
+        return this.#combinedGames.isValidMove(gameIndex, ...moveData);
     }
 
-    makeMove(pileIndex, removedItemCount){
-        const moveMade = this.#combinedGames.makeMove(pileIndex, removedItemCount);
+    makeMove(gameIndex, ...moveData){
+        const moveMade = this.#combinedGames.makeMove(gameIndex, ...moveData);
         if(moveMade) this.#turnIndex++;
         return moveMade;
     }
@@ -61,12 +62,12 @@ class BaseGameState {
         return this.#combinedGames.canMove();
     }
 
-    getRandomNextPosition(){
-        return this.#combinedGames.getRandomNextPosition();
+    getRandomNextGame(){
+        return this.#combinedGames.getRandomNextGame();
     }
 
-    getRandomOptimalNextPosition(){
-        return this.#combinedGames.getRandomOptimalNextPosition();
+    getRandomOptimalNextGame(){
+        return this.#combinedGames.getRandomOptimalNextGame();
     }
 
     isWinningGame(){

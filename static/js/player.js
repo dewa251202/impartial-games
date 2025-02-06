@@ -49,7 +49,7 @@ class PcPlayer extends Player {
      */
     doTurn(board, gameState){
         board.enableInteractions(false);
-        const nextPosition = this.#playOptimally ? gameState.getRandomOptimalNextPosition() : gameState.getRandomNextPosition();
+        const nextPosition = this.#playOptimally ? gameState.getRandomOptimalNextGame() : gameState.getRandomNextGame();
         return board.doPcPlayerTurn(nextPosition);
     }
 }

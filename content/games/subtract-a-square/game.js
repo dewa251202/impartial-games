@@ -1,45 +1,20 @@
-import { BaseGameState, SinglePileNim } from "base-game";
+import { BaseGameState, ScalarSubtractionGame } from "base-game";
 import { Controller } from "controller";
 import { Player } from "player";
-import { Piles } from "view/pile.js";
+import { Piles, RemoveTop } from "view/pile.js";
 import { ArrayInputBuilder } from "input/array.js";
 
-class SubtractASquare extends SinglePileNim {
+class SubtractASquare extends ScalarSubtractionGame {
     /**
      * 
      * @param {number} itemCount 
      */
     constructor(itemCount){
-        super(itemCount);
-    }
-
-    /**
-     * 
-     * @param {number} removedItemCount 
-     */
-    isValidMove(removedItemCount){
-        for(let i = 1; i * i <= removedItemCount; i++){
-            if(removedItemCount === i * i){
-                return true;
+        super(itemCount, function*(currentItemCount){
+            for(let i = 1; i * i <= currentItemCount; i++){
+                yield i * i;
             }
-        }
-        return false;
-    }
-
-    getNextPossibleGames(){
-        return this.getNextPossiblePositions().map(itemCount => new SubtractASquare(itemCount));
-    }
-
-    getNextPossiblePositions(){
-        const nextPossiblePositions = [];
-        for(let i = 1; i * i <= this.currentItemCount; i++){
-            nextPossiblePositions.push(this.currentItemCount - i * i);
-        }
-        return nextPossiblePositions;
-    }
-
-    hash(){
-        return this.currentItemCount;
+        });
     }
 }
 
@@ -47,8 +22,6 @@ class GameState extends BaseGameState {
     /**
      * 
      * @param {number[]} piles 
-     * @param {Player} [firstPlayer] 
-     * @param {Player} [secondPlayer] 
      */
     constructor(piles){
         super();
@@ -67,8 +40,7 @@ const pileInput = new ArrayInputBuilder()
     .setArrayLengthBound(1, 10)
     .setArrayValueBound(0, 15)
     .build();
-const gameState = new GameState(pileInput.defaultValue);
-const board = new Piles(gameState);
+const board = new Piles(new RemoveTop());
 new Controller([pileInput], board);
 
 export { GameState };

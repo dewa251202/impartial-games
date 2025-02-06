@@ -1,47 +1,27 @@
-import { Piles } from "view/pile.js";
-import { BaseGameState, SinglePileNim } from "base-game";
+import { Piles, RemoveTop } from "view/pile.js";
+import { BaseGameState, ScalarSubtractionGame } from "base-game";
 import { Controller } from "controller";
 import { ArrayInputBuilder } from "input/array.js";
 import { NumberInputBuilder } from "input/number.js";
 
-class SimpleTakeAwayGame extends SinglePileNim {
+class SimpleTakeAwayGame extends ScalarSubtractionGame {
     #maxItemsToRemove;
 
     /**
      * 
      * @param {number} itemCount 
-     * @param {number} maxItemsToRemove 
      */
     constructor(itemCount, maxItemsToRemove){
-        super(itemCount);
+        super(itemCount, function*(){
+            for(let i = 1; i <= maxItemsToRemove; i++){
+                yield i;
+            }
+        });
         this.#maxItemsToRemove = maxItemsToRemove;
     }
 
-    /**
-     * 
-     * @param {number} removedItemCount 
-     * @returns 
-     */
-    isValidMove(removedItemCount){
-        return 1 <= removedItemCount && removedItemCount <= this.#maxItemsToRemove;
-    }
-
-    getNextPossibleGames(){
-        return this.getNextPossiblePositions().map(itemCount => new SimpleTakeAwayGame(itemCount, this.#maxItemsToRemove));
-    }
-
-    getNextPossiblePositions(){
-        const nextPossiblePositions = [];
-        for(let i = 1; i <= this.#maxItemsToRemove; i++){
-            if(0 <= this.currentItemCount - i){
-                nextPossiblePositions.push(this.currentItemCount - i);
-            }
-        }
-        return nextPossiblePositions;
-    }
-
-    hash(){
-        return this.currentItemCount;
+    isValidMove(value){
+        return 1 <= value && value <= this.#maxItemsToRemove;
     }
 }
 
@@ -49,13 +29,14 @@ class GameState extends BaseGameState {
     /**
      * 
      * @param {number[]} piles 
-     * @param {number[]} maxItemsToRemove 
+     * @param {number} maxItemsToRemove 
      */
     constructor(piles, maxItemsToRemove){
         super();
         piles ??= [];
-        maxItemsToRemove ??= [];
+        maxItemsToRemove ??= 1;
         if(piles.length === 0) console.warn('There are no piles.');
+
         const games = piles.map(itemCount => new SimpleTakeAwayGame(itemCount, maxItemsToRemove));
         this.setGames(games);
     }
@@ -75,8 +56,7 @@ const numberInput = new NumberInputBuilder()
     .setValueDesc('m', 'Maximum removed items')
     .setValueBound(1, 10)
     .build();
-const gameState = new GameState(pileInput.defaultValue, numberInput.defaultValue);
-const board = new Piles(gameState);
+const board = new Piles(new RemoveTop());
 new Controller([pileInput, numberInput], board);
 
 export { GameState };

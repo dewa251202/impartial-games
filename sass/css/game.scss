@@ -55,6 +55,7 @@ dialog.new-game .content {
     justify-content: space-between;
     margin-bottom: 0.5em;
     align-items: baseline;
+    gap: 1em;
 }
 
 .left-header {
@@ -119,7 +120,7 @@ button.random {
     overflow-y: auto;
     display: flex;
     align-items: flex-end;
-    box-sizing: border-box;
+    justify-content: safe center;
 }
 
 .player {
@@ -174,14 +175,17 @@ input[type="radio"] {
 }
 
 game-piles {
-    width: 100%;
     display: flex;
     justify-content: space-evenly;
     align-items: flex-end;
+    gap: 1em;
+    margin-inline: 1em;
 }
 
 game-pile {
     flex-grow: 1;
+    // padding-bottom: 1em;
+    height: 100%;
 }
 
 .item-container {
@@ -191,10 +195,12 @@ game-pile {
 }
 
 .item {
-    width: 20%;
+    width: 40%;
     fill: none;
     display: flex;
     box-sizing: border-box;
+    stroke-width: 1px;
+    border: 1px solid black;
 }
 
 .cursor-pointer {
@@ -208,6 +214,7 @@ game-pile {
 .pile-base {
     border: 1px solid black;
     text-align: center;
+    min-width: 10vw;
 }
 
 game-status {

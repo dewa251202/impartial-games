@@ -1,3 +1,25 @@
+import { ImpartialGame } from "./impartial.js";
+
+class GameMap {
+    #map;
+
+    constructor(){
+        this.#map = new Map();
+    }
+
+    get(game){
+        return this.#map.get(game.hash());
+    }
+
+    set(game, value){
+        this.#map.set(game.hash(), value);
+    }
+
+    has(game){
+        return this.#map.has(game.hash());
+    }
+}
+
 class NimberAnalyzer {
     #games;
     #nextPossibleGames;
@@ -5,43 +27,46 @@ class NimberAnalyzer {
 
     /**
      * 
-     * @param {SinglePileNim[]} games 
+     * @param {ImpartialGame[]} games 
      */
     constructor(games){
         this.#games = games ?? [];
-        this.#nextPossibleGames = new Map();
-        this.#nimbers = new Map();
+        this.#nextPossibleGames = new GameMap();
+        this.#nimbers = new GameMap();
         this.#games.forEach(game => this.calculateNimber(game));
         // console.log(this.#nimbers);
     }
 
     /**
      * Returns the nimber (Grundy value) of a game
-     * @param {SinglePileNim} game 
+     * @param {ImpartialGame} game 
      * @returns {number}
      */
     calculateNimber(game){
         const stack = [game];
         const order = [];
+        // console.log(game);
         while(stack.length > 0){
             const top = stack.pop();
             order.push(top);
             const nextPossibleGames = top.getNextPossibleGames();
-            if(!this.#nextPossibleGames.has(top.hash())){
-                this.#nextPossibleGames.set(top.hash(), nextPossibleGames);
+            if(!this.#nextPossibleGames.has(top)){
+                this.#nextPossibleGames.set(top, nextPossibleGames);
             }
-            nextPossibleGames.forEach(g => stack.push(g));
+            nextPossibleGames.forEach(gs => gs.forEach(g => stack.push(g)));
         }
 
         while(order.length > 0){
             const top = order.pop();
-            if(this.#nimbers.has(top.hash())) continue;
-            const games = this.#nextPossibleGames.get(top.hash());
-            const nimber = mex(games.map(g => this.#nimbers.get(g.hash())));
-            this.#nimbers.set(top.hash(), nimber);
+            if(this.#nimbers.has(top)) continue;
+            const games = this.#nextPossibleGames.get(top);
+            const nimber = mex(games.map(gs => 
+                gs.map(g => this.#nimbers.get(g)).reduce((pv, cv) => pv ^ cv, 0)
+            ));
+            this.#nimbers.set(top, nimber);
         }
 
-        return this.#nimbers.get(game.hash());
+        return this.#nimbers.get(game);
     }
 }
 

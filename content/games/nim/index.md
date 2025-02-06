@@ -1,6 +1,6 @@
 +++
 title = "Nim"
-description = "The classic Nim game"
+description = "The classic Nim game."
 draft = false
 +++
 
