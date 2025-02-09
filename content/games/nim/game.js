@@ -20,6 +20,10 @@ class Nim extends ScalarSubtractionGame {
     isValidMove(value){
         return 1 <= value && value <= this.getPosition();
     }
+
+    calculateNimber(){
+        return this.getPosition();
+    }
 }
 
 class GameState extends BaseGameState {

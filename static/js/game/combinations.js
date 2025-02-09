@@ -86,8 +86,8 @@ class GameCombinations {
         const gameData = this.#movableGames[gameIndex];
         const nextPossibleGames = gameData.game.getNextPossibleGames();
         // console.log(gameData, nextPossibleGames);
-        const nextGame = nextPossibleGames[getRandomInt(0, nextPossibleGames.length - 1)];
-        return [gameData.index, nextGame];
+        const nextGames = nextPossibleGames[getRandomInt(0, nextPossibleGames.length - 1)];
+        return [gameData.index, nextGames];
     }
 
     getRandomOptimalNextGame(){

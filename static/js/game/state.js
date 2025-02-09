@@ -10,6 +10,10 @@ class BaseGameState {
     constructor(){
         this.#turnIndex = 0;
     }
+
+    getTurnIndex(){
+        return this.#turnIndex;
+    }
     
     /**
      * 

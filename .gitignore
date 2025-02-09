@@ -1,3 +1,5 @@
 public/
 .vscode/
 jsconfig.json
+templates/test.html
+content/test/

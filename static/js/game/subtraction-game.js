@@ -137,6 +137,14 @@ class ScalarSubtractionGame extends SubtractionGame {
     getPosition(){
         return super.getPosition()[0];
     }
+
+    /**
+     * 
+     * @returns {SubtractionGame[][]} 
+     */
+    getNextPossibleGames(){
+        return this.getNextPossiblePositions().map(([[pos]]) => [new ScalarSubtractionGame(pos, this.#subtractionSetGenerator)]);
+    }
 }
 
-export { ScalarSubtractionGame };
+export { ScalarSubtractionGame, SubtractionGame };

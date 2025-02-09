@@ -43,6 +43,8 @@ class NimberAnalyzer {
      * @returns {number}
      */
     calculateNimber(game){
+        if(game.calculateNimber) return game.calculateNimber();
+
         const stack = [game];
         const order = [];
         // console.log(game);

@@ -18,16 +18,9 @@ class Piles extends HTMLElement {
         this.startTurn();
     }
 
-    doPcPlayerTurn(nextGame){
-        if(nextGame === null) return false;
-        const [pileIndex, [game]] = nextGame;
-        // console.log(nextGame);
-        const itemIndex = game.getPosition();
-        setTimeout(() => {
-            this.notify('mouseenter', { pileIndex, itemIndex });
-            setTimeout(() => this.notify('click', { pileIndex, itemIndex }), 250);
-        }, 500);
-        return true;
+    doPcPlayerTurn(nextGames){
+        if(nextGames === null) return false;
+        return this.#interaction.doPcPlayerTurn(nextGames);
     }
 
     /**
@@ -54,6 +47,9 @@ class Piles extends HTMLElement {
     
     renderPiles(){
         this.#piles.forEach(pile => this.appendChild(pile));
+        if(this.#gameState.getTurnIndex() === 0){
+            this.notifyController('scrollbottom');
+        }
     }
     
     startTurn(){
@@ -123,33 +119,25 @@ class Pile extends HTMLElement {
             `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
             <rect x="0" y="0" width="100%" height="100%" stroke="black"/>
             </svg>`;
+            const itemNumber = document.createElement('div');
+            itemNumber.classList.add('item-number');
+            itemNumber.innerText = i + 1;
+            item.appendChild(itemNumber);
             item.classList.add('item');
             this.#items.push(item);
         }
 
         this.#items.forEach((item, i) => {
             const data = { pileIndex: this.#pileIndex, itemIndex: i };
-            this.#addListener('mouseleave', item, data);
-            this.#addListener('mouseenter', item.firstChild, data);
-            this.#addListener('click', item.firstChild, data);
+            this.#addListener('mouseleave', 'itemunhover', item, data);
+            this.#addListener('mouseenter', 'itemhover', item.firstChild, data);
+            this.#addListener('click', 'itemselect', item.firstChild, data);
         });
     }
     
     connectedCallback(){
-        const itemContainer = div();
+        const itemContainer = div(...this.#items);
         itemContainer.classList.add('item-container');
-        for(let i = 0; i < this.#items.length; i++){
-            if(i > 0){
-                const hitDiv = div();
-                hitDiv.style.paddingBlock = '0.1em';
-                hitDiv.style.width = '40%';
-                hitDiv.addEventListener('mouseenter', () => {
-                    console.log('henlo');
-                });
-                itemContainer.append(hitDiv);
-            }
-            itemContainer.appendChild(this.#items[i]);
-        }
         this.appendChild(itemContainer);
 
         const pileBase = document.createElement('div');
@@ -164,31 +152,31 @@ class Pile extends HTMLElement {
      */
     enableInteractions(value){
         this.#interactionsEnabled = value;
-        if(this.#interactionsEnabled && this.#lastData) this.#parent.notify('mouseenter', this.#lastData);
+        if(this.#interactionsEnabled && this.#lastData) this.#parent.notify('itemhover', this.#lastData);
         else this.#lastData = null;
-        if(this.#interactionsEnabled) this.addClasses(0, this.#itemCount, 'cursor-pointer');
-        else this.removeAllItemClasses('cursor-pointer');
+        if(this.#interactionsEnabled) this.addClassesToItems(0, this.#itemCount, 'cursor-pointer');
+        else this.removeClassesFromAllItems('cursor-pointer');
     }
 
-    #addListener(type, element, data){
-        element.addEventListener(type, () => {
-            if(type === 'mouseenter') this.#lastData = { ...data };
+    #addListener(eventName, type, element, data){
+        element.addEventListener(eventName, () => {
+            if(eventName === 'mouseenter') this.#lastData = { ...data };
             if(!this.#interactionsEnabled) return;
             this.#parent.notify(type, data);
         });
     }
 
-    removeAllItemClasses(...classes){
-        this.removeClasses(0, this.#itemCount, ...classes);
+    removeClassesFromAllItems(...classes){
+        this.removeClassesFromItems(0, this.#itemCount, ...classes);
     }
 
-    removeClasses(startItemIndex, endItemIndex, ...classes){
+    removeClassesFromItems(startItemIndex, endItemIndex, ...classes){
         for(let i = startItemIndex; i < endItemIndex; i++){
             this.#items[i].firstChild.classList.remove(...classes);
         }
     }
 
-    addClasses(startItemIndex, endItemIndex, ...classes){
+    addClassesToItems(startItemIndex, endItemIndex, ...classes){
         for(let i = startItemIndex; i < endItemIndex; i++){
             this.#items[i].firstChild.classList.add(...classes);
         }
@@ -201,6 +189,7 @@ class Pile extends HTMLElement {
 
 class RemoveTop {
     #board;
+    #lastHoverItem;
 
     /**
      * 
@@ -208,24 +197,49 @@ class RemoveTop {
      */
     setBoard(board){
         this.#board = board;
+        this.#lastHoverItem = null;
+    }
+
+    doPcPlayerTurn(nextGames){
+        const [pileIndex, [game]] = nextGames;
+        // console.log(nextGame);
+        const itemIndex = game.getPosition();
+        setTimeout(() => {
+            this.#board.notify('itemhover', { pileIndex, itemIndex });
+            setTimeout(() => this.#board.notify('itemselect', { pileIndex, itemIndex }), 250);
+        }, 500);
+        return true;
     }
 
     notify(type, data){
         const gameState = this.#board.getGameState();
-        const { game, pile, pileIndex, itemIndex } = data;
-        const itemCount = game.getPosition();
-        const removedItemCount = itemCount - itemIndex;
+        const { pile, pileIndex, itemIndex } = data;
+        const removedItemCount = itemIndex + 1;
         let currentPlayer = gameState.getCurrentPlayer();
 
-        if(type === 'mouseenter'){
-            if(gameState.isValidMove(pileIndex, removedItemCount)){
-                pile.addClasses(itemCount - removedItemCount, itemCount, 'ready-to-select');
+        const markHoveredItems = () => {
+            pile.addClassesToItems(0, removedItemCount, 'ready-to-select');
+            this.#lastHoverItem = [pile, itemIndex];
+        }
 
+        if(type === 'itemhover'){
+            if(gameState.isValidMove(pileIndex, removedItemCount)){
+                markHoveredItems();
+                
                 const moveMessage = `${currentPlayer.getRole()} is going to remove ${removedItemCount} items from ${pile.getName()}`;
                 this.#board.notifyController('beforemove', { moveMessage });
             }
         }
-        else if(type === 'click'){
+        else if(type === 'itemselect'){
+            if(this.#lastHoverItem === null){
+                markHoveredItems();
+                return;
+            }
+            if(!(this.#lastHoverItem[0] === pile && this.#lastHoverItem[1] === itemIndex)){
+                this.#lastHoverItem[0].removeClassesFromAllItems('ready-to-select');
+                markHoveredItems();
+                return;
+            }
             if(gameState.isValidMove(pileIndex, removedItemCount)){
                 gameState.makeMove(pileIndex, removedItemCount);
                 
@@ -235,8 +249,8 @@ class RemoveTop {
                 this.#board.startTurn();
             }
         }
-        else if(type === 'mouseleave'){
-            pile.removeAllItemClasses('ready-to-select');
+        else if(type === 'itemunhover'){
+            pile.removeClassesFromAllItems('ready-to-select');
             this.#board.notifyController('cancelmove', { moveMessage: '' });
         }
     }

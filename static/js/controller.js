@@ -79,18 +79,28 @@ class Controller {
             this.#settingsSidebar.open();
         }
         else if(sender === this.#board){
-            const { type, detail: { previousPlayer, currentPlayer, moveMessage } } = event;
-            if(type === 'gamefinished'){
-                console.log(previousPlayer.getRole() + ' won');
-            }
-            else if(type === 'gametype'){
-                console.log(event.detail.isWinning ? 'Winning game' : 'Losing game');
-            }
-            else{
-                this.#gameStatus.setMove(moveMessage);
-                if(type === 'aftermove'){
-                    this.#gameStatus.setPlayerTurn(currentPlayer.getRole());
-                }
+            this.#handleBoardEvents(event);
+        }
+    }
+
+    #handleBoardEvents(event){
+        if(event.type === 'scrollbottom'){
+            const gameBoard = document.querySelector('.game .board');
+            gameBoard.scrollTop = gameBoard.scrollHeight;
+            return;
+        }
+
+        const { type, detail: { previousPlayer, currentPlayer, moveMessage } } = event;
+        if(type === 'gamefinished'){
+            console.log(previousPlayer.getRole() + ' won');
+        }
+        else if(type === 'gametype'){
+            console.log(event.detail.isWinning ? 'Winning game' : 'Losing game');
+        }
+        else{
+            this.#gameStatus.setMove(moveMessage);
+            if(type === 'aftermove'){
+                this.#gameStatus.setPlayerTurn(currentPlayer.getRole());
             }
         }
     }
