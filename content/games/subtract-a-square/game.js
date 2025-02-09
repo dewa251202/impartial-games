@@ -1,6 +1,5 @@
 import { BaseGameState, ScalarSubtractionGame } from "base-game";
 import { Controller } from "controller";
-import { Player } from "player";
 import { Piles, RemoveTop } from "view/pile.js";
 import { ArrayInputBuilder } from "input/array.js";
 
@@ -34,7 +33,7 @@ class GameState extends BaseGameState {
 
 const pileInput = new ArrayInputBuilder()
     .setCaption('Enter the number of items in each pile:')
-    .setDefaultValue([7, 10, 12, 25])
+    .setDefaultValue([7, 10, 12])
     .setArrayLengthDesc('N', 'number of piles')
     .setArrayDesc('P', 'i', 'number of items in the i-th pile')
     .setArrayLengthBound(1, 10)

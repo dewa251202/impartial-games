@@ -197,32 +197,34 @@ game-pile {
 }
 
 .item {
-    width: 40%;
+    width: 30%;
+    height: 3vw;
     fill: none;
     display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.8em;
     box-sizing: border-box;
     stroke-width: 1px;
     border: 1px solid black;
     position: relative;
+    border-radius: 5px;
+}
+
+.item .hint {
+    position: absolute;
+    width: 0.6vw;
+    height: 0.6vw;
+    background-color: lightgreen;
+    border-radius: 50%;
 }
 
 .cursor-pointer {
     cursor: pointer;
 }
 
-.item .ready-to-select {
-    fill: lightgreen;
-}
-
-.item-number {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 0.8em;
-    z-index: -1;
+.item.ready-to-select {
+    background-color: lightgreen;
 }
 
 .pile-base {

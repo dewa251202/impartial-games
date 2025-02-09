@@ -1,7 +1,7 @@
 +++
 title = "Grundy's Game"
 description = "A game where you split a pile into two piles with unequal number of items."
-draft = false
+draft = true
 +++
 
 ## How to Play?
