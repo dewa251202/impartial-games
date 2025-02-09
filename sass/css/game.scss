@@ -213,10 +213,12 @@ game-pile {
 
 .item .hint {
     position: absolute;
-    width: 0.6vw;
-    height: 0.6vw;
+    width: 5px;
+    height: 5px;
     background-color: lightgreen;
-    border-radius: 50%;
+    border-radius: 5px;
+    top: 1px;
+    right: 1px;
 }
 
 .cursor-pointer {
