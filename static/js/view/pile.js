@@ -207,7 +207,7 @@ class Pile extends HTMLElement {
 
 class RemoveTop {
     #board;
-    #lastHoverItem;
+    #lastHoveredItem;
 
     /**
      * 
@@ -215,7 +215,7 @@ class RemoveTop {
      */
     setBoard(board){
         this.#board = board;
-        this.#lastHoverItem = null;
+        this.#lastHoveredItem = null;
     }
 
     doPcPlayerTurn(nextGames){
@@ -235,15 +235,11 @@ class RemoveTop {
         const { pile, pileIndex, itemIndex } = data;
         const removedItemCount = itemIndex + 1;
         let currentPlayer = gameState.getCurrentPlayer();
-
-        const markHoveredItems = () => {
-            pile.addClassesToItems(0, removedItemCount, 'ready-to-select');
-            this.#lastHoverItem = [pile, itemIndex];
-        }
-
+        
         if(type === 'itemhover'){
             if(gameState.isValidMove(pileIndex, removedItemCount)){
-                markHoveredItems();
+                pile.addClassesToItems(0, removedItemCount, 'ready-to-select');
+                this.#lastHoveredItem = [pile, itemIndex];
                 
                 const moveMessage = `${currentPlayer.getRole()} is going to remove ${removedItemCount} items from ${pile.getName()}`;
                 this.#board.notifyController('beforemove', { moveMessage });
@@ -251,17 +247,18 @@ class RemoveTop {
         }
         else if(type === 'itemselect'){
             if(gameState.isValidMove(pileIndex, removedItemCount)){
-                if(this.#lastHoverItem === null){
-                    markHoveredItems();
+                if(this.#lastHoveredItem === null){
+                    this.notify('itemhover', data);
                     return;
                 }
-                if(!(this.#lastHoverItem[0] === pile && this.#lastHoverItem[1] === itemIndex)){
-                    this.#lastHoverItem[0].removeClassesFromAllItems('ready-to-select');
-                    markHoveredItems();
+                else if(!(this.#lastHoveredItem[0] === pile && this.#lastHoveredItem[1] === itemIndex)){
+                    this.#lastHoveredItem[0].removeClassesFromAllItems('ready-to-select');
+                    this.notify('itemhover', data);
                     return;
                 }
 
                 gameState.makeMove(pileIndex, removedItemCount);
+                this.#lastHoveredItem = null;
                 
                 const moveMessage = `${currentPlayer.getRole()} removed ${removedItemCount} items from ${pile.getName()}`;
                 currentPlayer = gameState.getCurrentPlayer();

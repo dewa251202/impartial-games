@@ -213,12 +213,11 @@ game-pile {
 
 .item .hint {
     position: absolute;
-    width: 5px;
-    height: 5px;
+    width: 100%;
+    height: 100%;
     background-color: lightgreen;
-    border-radius: 5px;
-    top: 1px;
-    right: 1px;
+    border-radius: 4px;
+    clip-path: polygon(70% 0, 110% 0, 110% 40%);
 }
 
 .cursor-pointer {
@@ -226,7 +225,8 @@ game-pile {
 }
 
 .item.ready-to-select {
-    background-color: lightgreen;
+    background-color: lightgray;
+    opacity: 50%;
 }
 
 .pile-base {
