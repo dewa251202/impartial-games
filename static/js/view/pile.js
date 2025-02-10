@@ -104,9 +104,11 @@ class Pile extends HTMLElement {
     #parent;
     #items;
     #name;
+
     #interactionsEnabled;
     #lastData;
     #selectableItemIndices;
+    #touchDetected;
 
     constructor(itemCount, pileIndex, parent){
         super();
@@ -114,8 +116,10 @@ class Pile extends HTMLElement {
         this.#pileIndex = pileIndex;
         this.#parent = parent;
         this.#name = `Pile #${pileIndex + 1}`;
+
         this.#interactionsEnabled = false;
         this.#selectableItemIndices = [];
+        this.#touchDetected = false;
         
         this.#items = [];
         for(let i = 0; i < this.#itemCount; i++){
@@ -155,6 +159,9 @@ class Pile extends HTMLElement {
 
     #addListener(eventName, type, element, data){
         element.addEventListener(eventName, () => {
+            if(eventName === 'touchstart') this.#touchDetected = true;
+            if(this.#touchDetected && (eventName === 'touchstart' || eventName === 'mouseenter')) return;
+
             if(eventName === 'mouseenter') this.#lastData = { ...data };
             if(!this.#interactionsEnabled) return;
             this.#parent.notify(type, data);
@@ -191,6 +198,7 @@ class Pile extends HTMLElement {
 
             const data = { pile: this, pileIndex: this.#pileIndex, itemIndex };
             this.#addListener('mouseleave', 'itemunhover', item, data);
+            this.#addListener('touchstart', 'itemhover', item, data);
             this.#addListener('mouseenter', 'itemhover', item, data);
             this.#addListener('click', 'itemselect', item, data);
         }
