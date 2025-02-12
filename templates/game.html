@@ -6,9 +6,9 @@
 {% block title %}{{ page.title }} - {{ config.title }}{% endblock title %}
 
 {% block head %}
-<link rel="stylesheet" href="{{ SITE_ROOT }}/css/game.css">
+<link rel="stylesheet" href="{{ SITE_ROOT | safe }}/css/game.css">
 <script>
-const SITE_ROOT = "{{ SITE_ROOT }}";
+const SITE_ROOT = "{{ SITE_ROOT | safe }}";
 </script>
 <script type="importmap">
 {
