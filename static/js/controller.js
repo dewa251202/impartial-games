@@ -112,7 +112,8 @@ class Controller {
         }
         
         const gameBoard = document.querySelector('.game .board');
-        gameBoard.appendChild(this.#board);
+        const shadow = gameBoard.attachShadow({ mode: 'closed' });
+        shadow.appendChild(this.#board);
     }
 
     #startNewGame(isFirstTime = false){

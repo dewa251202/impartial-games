@@ -39,12 +39,17 @@ class Piles extends HTMLElement {
         this.#controller.notify(this, event);
     }
     
-    updateGames(){
+    #updateGames(){
         this.#games = this.#gameState.getGames();
         this.#piles = this.#games.map((game, gameIndex) => new Pile(game.getPosition(), gameIndex, this));
     }
     
-    renderPiles(){
+    #renderPiles(){
+        const style = document.createElement('link');
+        style.rel = 'stylesheet';
+        style.href = `${SITE_ROOT}/css/pile.css`;
+        this.appendChild(style);
+
         this.#piles.forEach(pile => this.appendChild(pile));
         this.#interaction.markSelectableItems(this.#games, this.#piles);
         if(this.#gameState.getTurnIndex() === 0){
@@ -53,9 +58,9 @@ class Piles extends HTMLElement {
     }
     
     startTurn(){
-        this.clear();
-        this.updateGames();
-        this.renderPiles();
+        this.#clear();
+        this.#updateGames();
+        this.#renderPiles();
         this.notifyController('gametype', { isWinning: this.#gameState.isWinningGame() });
         if(!this.#gameState.getCurrentPlayer().doTurn(this, this.#gameState)){
             this.enableInteractions(false);
@@ -91,7 +96,7 @@ class Piles extends HTMLElement {
         this.#controller = controller;
     }
 
-    clear(){
+    #clear(){
         while(this.hasChildNodes()){
             this.removeChild(this.lastChild);
         }
