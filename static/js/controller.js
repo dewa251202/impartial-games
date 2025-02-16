@@ -124,6 +124,7 @@ class Controller {
         else{
             const results = this.#inputs.map(input => input.parseValue());
             if(results.some(result => result.type === InputState.Invalid)){
+                console.log(results[0].message);
                 return;
             }
             args = results.map(result => result.data);
