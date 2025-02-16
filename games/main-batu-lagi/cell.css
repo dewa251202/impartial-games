@@ -1,0 +1,90 @@
+game-cells {
+    display: flex;
+    min-width: 100%;
+    min-height: 100%;
+    position: absolute;
+    overflow-x: auto;
+    padding: 0 1em;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+}
+
+game-cell {
+    width: 8vw;
+    aspect-ratio: 1 / 1;
+    border: 1px solid black;
+    display: flex;
+    align-items: flex-start;
+    position: relative;
+}
+
+game-cell.hinting .hint {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    clip-path: polygon(85% 0, 110% 0, 110% 25%);
+    position: absolute;
+}
+
+game-cell.hinting .hint, game-cell.droppable {
+    background-color: palegreen;
+}
+
+game-cell.about-to-drop, game-cell.about-to-drop .hint {
+    background-color: lightgreen;
+}
+
+.cell-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    width: 100%;
+    top: -1.5em;
+}
+
+.item-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    position: absolute;
+}
+
+.item-container {
+    /* position: absolute; */
+    top: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-block: 1em;
+}
+
+.item {
+    display: block;
+    width: calc(8vw * 0.7);
+    aspect-ratio: 1 / 1;
+    border: 1px solid black;
+    border-radius: 100%;
+    cursor: pointer;
+}
+
+.cell-item-wrapper {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.item.disabled {
+    cursor: default;
+}
+
+.item:not(.disabled):hover {
+    background-color: lightblue;
+}
+
+.item.dragging {
+    background-color: skyblue;
+}

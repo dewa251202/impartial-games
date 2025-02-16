@@ -1,0 +1,4 @@
+User-agent: *
+Disallow:
+Allow: /
+Sitemap: https://dewa251202.github.io/impartial-games/sitemap.xml
