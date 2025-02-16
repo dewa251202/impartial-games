@@ -67,7 +67,10 @@ class Cells extends HTMLElement {
             const cellIndex = game.getPosition();
             const cell = this.#cells[cellIndex];
             const cellClickData = { eventSource: 'cell', cellIndex, gameIndex, cell };
-            setTimeout(() => this.notify('cellclick', cellClickData), 250);
+            setTimeout(() => {
+                this.notify('cellclicking', cellClickData);
+                setTimeout(() => this.notify('cellclicked', cellClickData), 250);
+            }, 250);
         }, 500);
         return true;
     }
@@ -169,20 +172,36 @@ class Cells extends HTMLElement {
                 const sourceCell = this.querySelector(`[game-index="${gameIndex}"]`).getSourceCell();
                 this.#makeMove(gameIndex, cellIndex, sourceCell);
             }
-            else if(type === 'cellclick'){
-                if(this.#lastClickedGame === null) return;
-                cell.classList.add('about-to-drop');
-                const [sourceCellIndex, itemGameIndex] = this.#lastClickedGame;
-                
-                const sourceCell = this.#cells[sourceCellIndex];
-                this.#makeMove(itemGameIndex, cellIndex, sourceCell);
-            }
             else if(type === 'cellhover' && this.#lastClickedGame !== null){
                 const [cellIndex, _] = this.#lastClickedGame;
                 const sourceCell = this.#cells[cellIndex];
                 this.#notifyController('beforemove', {
                     moveMessage: `${currentPlayer.getRole()} is going to move an item from ${sourceCell.getName()} to ${cell.getName()}`
                 });
+            }
+            else if(type === 'cellclicking'){
+                cell.classList.add('about-to-drop');
+
+                if(this.#lastClickedGame === null) return;
+                const [sourceCellIndex, _] = this.#lastClickedGame;
+                
+                const sourceCell = this.#cells[sourceCellIndex];
+                this.#notifyController('beforemove', {
+                    moveMessage: `${currentPlayer.getRole()} is going to move an item from ${sourceCell.getName()} to ${cell.getName()}`
+                });
+            }
+            else if(type === 'pointerentercell'){
+                cell.classList.add('about-to-drop');
+            }
+            else if(type === 'pointerleavecell'){
+                cell.classList.remove('about-to-drop');
+            }
+            else if(type === 'cellclicked'){
+                if(this.#lastClickedGame === null) return;
+                const [sourceCellIndex, itemGameIndex] = this.#lastClickedGame;
+                
+                const sourceCell = this.#cells[sourceCellIndex];
+                this.#makeMove(itemGameIndex, cellIndex, sourceCell);
             }
         }
     }
@@ -295,7 +314,10 @@ class Cell extends HTMLElement {
         this.#addListener('dragover', 'itemovercell', this, cellData);
         this.#addListener('dragleave', 'itemleavecell', this, cellData);
         this.#addListener('drop', 'itemdropcell', this, cellData);
-        this.#addListener('click', 'cellclick', this, cellData);
+        this.#addListener('pointerdown', 'cellclicking', this, cellData);
+        this.#addListener('pointerup', 'cellclicked', this, cellData);
+        this.#addListener('pointerenter', 'pointerentercell', this, cellData);
+        this.#addListener('pointerleave', 'pointerleavecell', this, cellData);
         this.#addListener('mouseover', 'cellhover', this, cellData);
     }
 

@@ -72,7 +72,7 @@ class Input extends BaseInput {
 
     parseValue(){
         const inputValue = this.#inputTextarea.getValue();
-        if(inputValue === '') this.setValue(this.#placeholder);
+        if(inputValue === '') this.setValue(this.defaultValue);
         const lines = inputValue
             .split(/\r\n|\r|\n/)
             .map(line => line.trim())
