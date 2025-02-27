@@ -1,3 +1,16 @@
+@use 'common';
+@use 'sass:math';
+
+$pile-width: 10vw;
+
+$item-size: $pile-width * 0.3;
+$item-border-radius: 20%;
+
+$separator-width: $pile-width * 0.48;
+$separator-height: $item-size * 0.64;
+
+$separator-side-radius: math.div($separator-height, 4);
+
 game-piles {
     display: flex;
     justify-content: center;
@@ -12,7 +25,7 @@ game-piles {
 
 game-pile {
     height: 100%;
-    width: 10vw;
+    width: $pile-width;
 }
 
 .item-container {
@@ -22,9 +35,9 @@ game-pile {
     width: 100%;
 }
 
-.item {
-    width: 30%;
-    height: 3vw;
+pile-item {
+    width: $item-size;
+    height: $item-size;
     fill: none;
     display: flex;
     justify-content: center;
@@ -34,29 +47,60 @@ game-pile {
     stroke-width: 1px;
     border: 1px solid black;
     position: relative;
-    border-radius: 5px;
+    border-radius: $item-border-radius;
+
+    .hint {
+        position: absolute;
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        background-color: lightgreen;
+        border-radius: $item-border-radius * 0.95;
+        clip-path: polygon(70% 0, 110% 0, 110% 40%);
+    }
+
+    &.ready-to-select {
+        background-color: lightgray;
+        opacity: 50%;
+    }
+
+    &.split-old {
+        background-color: lightblue;
+    }
+
+    &.split-new {
+        background-color: lightsalmon;
+    }
 }
 
-.item .hint {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background-color: lightgreen;
-    border-radius: 4px;
-    clip-path: polygon(70% 0, 110% 0, 110% 40%);
-}
+item-separator {
+    border: 1px dashed black;
+    width: $separator-width;
+    position: relative;
 
-.item.ready-to-select {
-    background-color: lightgray;
-    opacity: 50%;
+    .hit-area {
+        width: 100%;
+        position: absolute;
+        top: -(math.div($separator-height, 2));
+        padding-block: math.div($separator-height, 2);
+    }
+
+    .side-hit-area {
+        border-radius: 100%;
+        width: 2 * $separator-side-radius;
+        aspect-ratio: 1 / 1;
+        background-color: black;
+        position: absolute;
+        right: -2 * $separator-side-radius;
+        top: -$separator-side-radius;
+    }
+
+    &.expanded {
+        margin: 0.25em;
+    }
 }
 
 .pile-base {
     border: 1px solid black;
     text-align: center;
     width: 100%;
-}
-
-.cursor-pointer {
-    cursor: pointer;
 }

@@ -51,7 +51,7 @@ class Piles extends HTMLElement {
         this.appendChild(style);
 
         this.#piles.forEach(pile => this.appendChild(pile));
-        this.#interaction.markSelectableItems(this.#games, this.#piles);
+        this.#interaction.mapGamesToPiles(this.#games, this.#piles);
         if(this.#gameState.getTurnIndex() === 0){
             this.notifyController('scrollbottom');
         }
@@ -113,6 +113,7 @@ class Pile extends HTMLElement {
     #interactionsEnabled;
     #lastData;
     #selectableItemIndices;
+    #visibleSeparatorIndices;
     #touchDetected;
 
     constructor(itemCount, pileIndex, parent){
@@ -124,19 +125,23 @@ class Pile extends HTMLElement {
 
         this.#interactionsEnabled = false;
         this.#selectableItemIndices = [];
+        this.#visibleSeparatorIndices = [];
         this.#touchDetected = false;
         
         this.#items = [];
         for(let i = 0; i < this.#itemCount; i++){
-            const item = document.createElement('div');
-            item.innerText = i + 1;
-            item.classList.add('item');
-            this.#items.push(item);
+            this.#items.push(new Item(this, i));
         }
     }
     
     connectedCallback(){
-        const itemContainer = div(...this.#items);
+        const itemContainer = div();
+        for(let i = 0; i < this.#items.length; i++){
+            if(this.#visibleSeparatorIndices.includes(i)){
+                itemContainer.appendChild(new ItemSeparator(this, i));
+            }
+            itemContainer.appendChild(this.#items[i]);
+        }
         itemContainer.classList.add('item-container');
         this.appendChild(itemContainer);
 
@@ -157,20 +162,21 @@ class Pile extends HTMLElement {
         else this.#lastData = null;
 
         if(this.#interactionsEnabled){
-            this.#selectableItemIndices.forEach(i => this.#items[i].classList.add('cursor-pointer'));
+            this.#selectableItemIndices.forEach(i => this.#items[i].addClasses('cursor-pointer'));
         }
         else this.removeClassesFromAllItems('cursor-pointer');
     }
 
-    #addListener(eventName, type, element, data){
-        element.addEventListener(eventName, () => {
-            if(eventName === 'touchstart') this.#touchDetected = true;
-            if(this.#touchDetected && (eventName === 'touchstart' || eventName === 'mouseenter')) return;
+    notify(eventName, type, data){
+        if(eventName === 'touchstart') this.#touchDetected = true;
+        if(this.#touchDetected && type === 'itemhover') return;
 
-            if(eventName === 'mouseenter') this.#lastData = { ...data };
-            if(!this.#interactionsEnabled) return;
-            this.#parent.notify(type, data);
-        });
+        if(eventName === 'mouseenter') this.#lastData = { ...data };
+
+        if(!this.#interactionsEnabled) return;
+
+        data = { ...data, pile: this, pileIndex: this.#pileIndex };
+        this.#parent.notify(type, data);
     }
 
     removeClassesFromAllItems(...classes){
@@ -179,13 +185,13 @@ class Pile extends HTMLElement {
 
     removeClassesFromItems(startItemIndex, endItemIndex, ...classes){
         for(let i = startItemIndex; i < endItemIndex; i++){
-            this.#items[i].classList.remove(...classes);
+            this.#items[i].removeClasses(...classes);
         }
     }
 
     addClassesToItems(startItemIndex, endItemIndex, ...classes){
         for(let i = startItemIndex; i < endItemIndex; i++){
-            this.#items[i].classList.add(...classes);
+            this.#items[i].addClasses(...classes);
         }
     }
 
@@ -194,19 +200,11 @@ class Pile extends HTMLElement {
     }
 
     markSelectableItems(){
-        for(const itemIndex of this.#selectableItemIndices){
-            const item = this.#items[itemIndex];
-            const hint = document.createElement('div');
-            hint.classList.add('hint', 'cursor-pointer');
+        this.#selectableItemIndices.forEach(i => this.#items[i].makeSelectable());
+    }
 
-            item.appendChild(hint);
-
-            const data = { pile: this, pileIndex: this.#pileIndex, itemIndex };
-            this.#addListener('mouseleave', 'itemunhover', item, data);
-            this.#addListener('touchstart', 'itemhover', item, data);
-            this.#addListener('mouseenter', 'itemhover', item, data);
-            this.#addListener('click', 'itemselect', item, data);
-        }
+    setVisibleSeparatorIndices(visibleSeparatorIndices){
+        this.#visibleSeparatorIndices = visibleSeparatorIndices;
     }
 
     getItemCount(){
@@ -215,6 +213,91 @@ class Pile extends HTMLElement {
 
     getName(){
         return this.#name;
+    }
+}
+
+class Item extends HTMLElement {
+    #pile;
+    #index;
+
+    constructor(pile, index){
+        super();
+        this.#pile = pile;
+        this.#index = index;
+    }
+
+    connectedCallback(){
+        this.innerText = this.#index + 1;
+    }
+
+    makeSelectable(){
+        const hint = div();
+        hint.classList.add('hint', 'cursor-pointer');
+        this.appendChild(hint);
+
+        this.#addListener('mouseleave', 'itemunhover');
+        this.#addListener('touchstart', 'itemhover');
+        this.#addListener('mouseenter', 'itemhover');
+        this.#addListener('click', 'itemselect');
+    }
+
+    #addListener(eventName, type){
+        const data = { itemIndex: this.#index };
+        this.addEventListener(eventName, () => this.#pile.notify(eventName, type, data));
+    }
+
+    addClasses(...classes){
+        this.classList.add(...classes);
+    }
+
+    removeClasses(...classes){
+        this.classList.remove(...classes);
+    }
+}
+
+class ItemSeparator extends HTMLElement {
+    #pile;
+    #index;
+
+    constructor(pile, index){
+        super();
+        this.#pile = pile;
+        this.#index = index;
+    }
+
+    connectedCallback(){
+        const hitArea = div();
+        hitArea.classList.add('hit-area');
+        this.appendChild(hitArea);
+        
+        const sideHitArea = div();
+        sideHitArea.classList.add('side-hit-area', 'cursor-pointer');
+        sideHitArea.addEventListener('click', () => {
+            console.log('cluck');
+        });
+
+        const hitAreas = [hitArea, sideHitArea];
+        hitAreas.forEach(ha => ha.addEventListener('mouseenter', () => this.expand()));
+        hitAreas.forEach(ha => ha.addEventListener('mouseleave', () => this.collapse()));
+
+        this.appendChild(sideHitArea);
+    }
+
+    #addListener(eventName, type){
+        const data = { separatorIndex: this.#index };
+        this.addEventListener(eventName, () => this.#pile.notify(eventName, type, data));
+    }
+
+    expand(){
+        this.classList.add('expanded', 'cursor-pointer');
+        this.#pile.addClassesToItems(0, this.#index, 'split-new');
+        this.#pile.addClassesToItems(this.#index, this.#pile.getItemCount(), 'split-old');
+    }
+    
+    collapse(){
+        this.classList.remove('expanded', 'cursor-pointer');
+        this.#pile.removeClassesFromItems(0, this.#index, 'split-new');
+        this.#pile.removeClassesFromItems(this.#index, this.#pile.getItemCount(), 'split-old');
     }
 }
 
@@ -285,7 +368,7 @@ class RemoveTop {
         }
     }
 
-    markSelectableItems(games = [], piles = []){
+    mapGamesToPiles(games = [], piles = []){
         for(let i = 0; i < games.length; i++){
             const itemIndices = games[i].getNextPossibleGames().map(([g]) => piles[i].getItemCount() - g.getPosition() - 1);
             piles[i].setSelectableItemIndices(itemIndices);
@@ -312,11 +395,13 @@ class SplitPile {
         }
     }
 
-    markSelectableItems(){
-
+    mapGamesToPiles(games = [], piles = []){
+        
     }
 }
 
+customElements.define('pile-item', Item);
+customElements.define('item-separator', ItemSeparator);
 customElements.define('game-pile', Pile);
 customElements.define('game-piles', Piles);
 
